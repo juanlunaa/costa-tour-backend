@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +38,7 @@ public class ClienteService {
     private StorageService storageService;
 
     @Value("${uploadfiles.avatar.location}")
-    private String filesLocation;
+    private String avatarsLocation;
 
     public ClienteDTO getClientByDni (String dni) {
         Cliente cliente = clienteRepository.findById(dni).orElse(null);
@@ -64,7 +65,7 @@ public class ClienteService {
         clienteRepository.save(cliente);
     }
 
-    public void uploadAvatar (String dniCliente, MultipartFile file) {
+    public void uploadAvatar (String dniCliente, MultipartFile file, String hostUrl) {
         if (file.isEmpty()) {
             throw new RuntimeException("Failed saving, file is empty");
         }
@@ -78,9 +79,15 @@ public class ClienteService {
         String filename = String
                 .format("%s-avatar%s", dniCliente, getFileExtension(file.getOriginalFilename()));
 
-        storageService.saveFile(filesLocation, file, filename);
+        storageService.saveFile(avatarsLocation, file, filename);
 
-        cliente.getUsuario().setImagenPerfil(filename);
+        String avatarUrl = ServletUriComponentsBuilder
+                    .fromHttpUrl(hostUrl)
+                    .path("/files/avatars/")
+                    .path(filename)
+                    .toUriString();
+
+        cliente.getUsuario().setImagenPerfil(avatarUrl);
 
         usuarioRepository.save(cliente.getUsuario());
     }
