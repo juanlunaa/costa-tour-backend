@@ -18,7 +18,7 @@ public class Cliente{
     private String dni;
 
     @Column(name = "fecha_nacimiento_cliente")
-    private String fechaNacimiento;
+    private Date fechaNacimiento;
 
     @Column(name = "edad_cliente")
     private Integer edad;
