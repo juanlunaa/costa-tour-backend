@@ -1,5 +1,7 @@
 package application.costa_tour.service;
 
+import application.costa_tour.exception.ResourceNotFoundException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
@@ -15,6 +17,18 @@ import java.nio.file.StandardCopyOption;
 
 @Service
 public class StorageService {
+
+    @Value("${uploadfiles.avatar.location}")
+    private String avatarsLocation;
+
+    public String saveAvatar (Long userId, MultipartFile file) {
+        String filename = String
+                .format("%s-avatar%s", userId, getFileExtension(file.getOriginalFilename()));
+
+        saveFile(avatarsLocation, file, filename);
+
+        return filename;
+    }
 
     public void saveFile (String filesLocation, MultipartFile file, String filename) {
         try{
@@ -42,10 +56,19 @@ public class StorageService {
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new RuntimeException("Couldn't read file.");
+                throw new ResourceNotFoundException("Couldn't read file.");
             }
         } catch (MalformedURLException e) {
-            throw new RuntimeException("Couldn't read file.");
+            throw new RuntimeException("Couldn't read file. :D");
         }
+    }
+
+    private String getFileExtension (String filename) {
+        String fileExtension = "";
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex > 0 && dotIndex < filename.length() - 1) {
+            return fileExtension = filename.substring(dotIndex);
+        }
+        return ".jpg";
     }
 }
