@@ -1,5 +1,6 @@
 package application.costa_tour.controller;
 
+import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +31,11 @@ public class MediaController {
     ) throws IOException {
         System.out.println(filename);
         Resource file = storageService.loadFile(avatarsLocation + "/" + filename);
+
+        if (file == null) {
+            throw new ResourceNotFoundException("Resource not found");
+        }
+
         String contentType = Files.probeContentType(file.getFile().toPath());
 
         return ResponseEntity
