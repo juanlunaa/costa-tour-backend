@@ -2,22 +2,37 @@ package application.costa_tour.controller;
 
 import application.costa_tour.dto.ClienteCreateDTO;
 import application.costa_tour.dto.ClienteDTO;
+import application.costa_tour.dto.mapper.ClienteCreateMapper;
+import application.costa_tour.exception.ClientAlredyExistException;
+import application.costa_tour.exception.ResourceNotFoundException;
+import application.costa_tour.model.Cliente;
+import application.costa_tour.service.CiudadService;
 import application.costa_tour.service.ClienteService;
-import jakarta.servlet.http.HttpServletRequest;
+import application.costa_tour.service.TipoDocumentoService;
+import application.costa_tour.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/cliente")
+@RequestMapping("/client")
+@Validated
 public class ClienteController {
+
+    @Autowired
+    private UsuarioService usuarioService;
 
     @Autowired
     private ClienteService clienteService;
 
     @Autowired
-    private HttpServletRequest req;
+    private TipoDocumentoService tipoDocumentoService;
+
+    @Autowired
+    private CiudadService ciudadService;
 
     @GetMapping
     public ResponseEntity<?> clientByDni (@RequestParam String dni) {
@@ -26,21 +41,29 @@ public class ClienteController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createClient (@ModelAttribute ClienteCreateDTO cliente) {
-        clienteService.createClient(cliente);
-        return ResponseEntity.ok("Cliente creado correctamente");
-    }
+    public ResponseEntity<?> createClient (@ModelAttribute @Valid ClienteCreateDTO clienteDto) {
 
-    @PostMapping("/update/avatar")
-    public ResponseEntity<?> changeAvatar (
-            @RequestParam("dni") String dniCliente,
-            @RequestParam("avatar") MultipartFile file
-    ) {
-        clienteService.uploadAvatar(dniCliente, file,
-                req
-                    .getRequestURL()
-                    .toString()
-                    .replace(req.getRequestURI(), ""));
-        return ResponseEntity.ok("Imagen actulizada correctamente");
+        if (clienteService.isExistingClient(clienteDto.getDni())) {
+            throw new ClientAlredyExistException("Client already exist.");
+        }
+
+        if (!tipoDocumentoService.isExistDocType(clienteDto.getIdTipoDocumento())) {
+            throw new ResourceNotFoundException("Doc type not found to id=" + clienteDto.getIdTipoDocumento());
+        }
+
+        if (!ciudadService.isExitsCity(clienteDto.getIdCiudad())) {
+            throw new ResourceNotFoundException("City not found to id=" + clienteDto.getIdCiudad());
+        }
+
+        Cliente cliente = ClienteCreateMapper.mapper.clienteCreateDtoToCliente(clienteDto);
+
+        cliente.getUsuario().setTipo("Cliente");
+        usuarioService.createUser(cliente.getUsuario());
+
+        ClienteDTO clienteRes = clienteService.createClient(cliente);
+        return new ResponseEntity<>(
+                clienteRes,
+                HttpStatus.CREATED
+                );
     }
 }
