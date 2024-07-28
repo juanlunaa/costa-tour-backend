@@ -11,7 +11,6 @@ public interface ClienteCreateMapper {
 
     ClienteCreateMapper mapper = Mappers.getMapper(ClienteCreateMapper.class);
 
-    @Mapping(source = "tipoUsuario", target = "usuario.tipo")
     @Mapping(source = "nombre", target = "usuario.nombre")
     @Mapping(source = "apellido", target = "usuario.apellido")
     @Mapping(source = "telefono", target = "usuario.telefono")
