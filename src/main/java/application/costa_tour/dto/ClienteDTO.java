@@ -6,6 +6,7 @@ import java.util.Date;
 
 @Data
 public class ClienteDTO {
+    private Long userId;
     private String dni;
     private String tipoDocumento;
     private String tipoUsuario;
