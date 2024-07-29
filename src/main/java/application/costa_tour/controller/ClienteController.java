@@ -6,6 +6,7 @@ import application.costa_tour.dto.mapper.ClienteCreateMapper;
 import application.costa_tour.exception.ClientAlredyExistException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.model.Cliente;
+import application.costa_tour.model.UserRole;
 import application.costa_tour.service.CiudadService;
 import application.costa_tour.service.ClienteService;
 import application.costa_tour.service.TipoDocumentoService;
@@ -57,7 +58,7 @@ public class ClienteController {
 
         Cliente cliente = ClienteCreateMapper.mapper.clienteCreateDtoToCliente(clienteDto);
 
-        cliente.getUsuario().setTipo("Cliente");
+        cliente.getUsuario().setTipo(UserRole.CLIENTE);
         usuarioService.createUser(cliente.getUsuario());
 
         ClienteDTO clienteRes = clienteService.createClient(cliente);

@@ -2,7 +2,9 @@ package application.costa_tour.service;
 
 import application.costa_tour.dto.ClienteDTO;
 import application.costa_tour.dto.mapper.ClienteMapper;
+import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.model.Cliente;
+import application.costa_tour.model.Usuario;
 import application.costa_tour.repository.ClienteRepository;
 import application.costa_tour.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,10 +21,16 @@ public class ClienteService {
     private ClienteRepository clienteRepository;
 
     @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
     private StorageService storageService;
+
+    public ClienteDTO getClientByUser (Usuario user) {
+        Cliente client = clienteRepository.findClienteByUsuarioId(user.getId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(String
+                            .format("Client not found for user=%s %s", user.getNombre(), user.getApellido())));
+
+        return ClienteMapper.mapper.clienteToClienteDto(client);
+    }
 
     public ClienteDTO getClientByDni (String dni) {
         Cliente cliente = clienteRepository.findById(dni).orElse(null);
