@@ -14,10 +14,11 @@ public class Usuario {
     @Id
     @Column(name = "id_usuario")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "tipo_usuario")
-    private String tipo;
+    private UserRole tipo;
 
     @Column(name = "nombre_usuario")
     private String nombre;
