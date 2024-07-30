@@ -20,9 +20,6 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
-    @Autowired
-    private StorageService storageService;
-
     public ClienteDTO getClientByUser (Usuario user) {
         Cliente client = clienteRepository.findClienteByUsuarioId(user.getId())
                 .orElseThrow(() ->

@@ -5,6 +5,7 @@ import application.costa_tour.dto.request.UpdateAvatarReqDTO;
 import application.costa_tour.exception.*;
 import application.costa_tour.model.UserRole;
 import application.costa_tour.model.Usuario;
+import application.costa_tour.service.AdministradorService;
 import application.costa_tour.service.ClienteService;
 import application.costa_tour.service.StorageService;
 import application.costa_tour.service.UsuarioService;
@@ -30,6 +31,9 @@ public class UserController {
     private ClienteService clienteService;
 
     @Autowired
+    private AdministradorService administradorService;
+
+    @Autowired
     private HttpServletRequest req;
 
     @PostMapping("/auth")
@@ -48,9 +52,7 @@ public class UserController {
 
         if (user.getTipo().equals(UserRole.ADMINISTRADOR)) {
             return new ResponseEntity<>(
-                SuccessResponse.builder()
-                    .message("Login administrator")
-                    .build(),
+                administradorService.getAdminByUser(user),
                 HttpStatus.OK
             );
         }
