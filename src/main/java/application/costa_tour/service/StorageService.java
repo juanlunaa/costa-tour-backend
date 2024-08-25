@@ -56,7 +56,7 @@ public class StorageService {
             if (resource.exists() || resource.isReadable()) {
                 return resource;
             } else {
-                throw new ResourceNotFoundException("Couldn't read file.");
+                throw new ResourceNotFoundException("Resource not found.");
             }
         } catch (MalformedURLException e) {
             throw new RuntimeException("Couldn't read file. :D");

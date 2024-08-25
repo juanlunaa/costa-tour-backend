@@ -81,11 +81,7 @@ public class UserController {
         usuarioService
             .updateUserAvatarPath(
                 userId,
-                filename,
-                req
-                    .getRequestURL()
-                    .toString()
-                    .replace(req.getRequestURI(), ""));
+                filename);
 
         return new ResponseEntity<>(
                 SuccessResponse.builder()

@@ -29,7 +29,6 @@ public class MediaController {
     public ResponseEntity<Resource> getResource (
             @PathVariable String filename
     ) throws IOException {
-        System.out.println(filename);
         Resource file = storageService.loadFile(avatarsLocation + "/" + filename);
 
         if (file == null) {

@@ -26,7 +26,7 @@ public class UsuarioService {
     }
 
     public void createUser (Usuario usuario) {
-        usuario.setImagenPerfil("http://localhost:4000/files/avatars/avatar-default.png");
+        usuario.setImagenPerfil("/files/avatars/avatar-default.png");
         usuarioRepository.save(usuario);
     }
 
@@ -34,12 +34,8 @@ public class UsuarioService {
         return usuarioRepository.existsById(id);
     }
 
-    public void updateUserAvatarPath (Long userId, String filename, String hostUrl) {
-        String avatarUrl = ServletUriComponentsBuilder
-                .fromHttpUrl(hostUrl)
-                .path("/files/avatars/")
-                .path(filename)
-                .toUriString();
+    public void updateUserAvatarPath (Long userId, String filename) {
+        String avatarUrl = "/files/avatars/" + filename;
 
         Usuario usuario = usuarioRepository.findById(userId).orElse(null);
 
