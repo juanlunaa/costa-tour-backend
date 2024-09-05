@@ -23,4 +23,8 @@ public class AdministradorService {
 
         return AdministradorMapper.mapper.administradorToAdministradorDto(admin);
     }
+
+    public void createAdmin (Administrador admin) {
+        administradorRepository.save(admin);
+    }
 }

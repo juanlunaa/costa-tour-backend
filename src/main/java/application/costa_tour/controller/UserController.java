@@ -9,7 +9,6 @@ import application.costa_tour.service.AdministradorService;
 import application.costa_tour.service.ClienteService;
 import application.costa_tour.service.StorageService;
 import application.costa_tour.service.UsuarioService;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,9 +31,6 @@ public class UserController {
 
     @Autowired
     private AdministradorService administradorService;
-
-    @Autowired
-    private HttpServletRequest req;
 
     @PostMapping("/auth")
     public ResponseEntity<?> loginUser (

@@ -14,6 +14,18 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(AdminAlreadyExistException.class)
+    public ResponseEntity<?> handlerAdminAlreadyExistException (
+            AdminAlreadyExistException ex,
+            WebRequest webRequest
+    ) {
+        return new ResponseEntity<>(
+                new ErrorResponse(
+                        ex.getMessage(),
+                        webRequest.getDescription(false)),
+                HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<?> handlerInvalidCredentialsException (
             InvalidCredentialsException ex,

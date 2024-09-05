@@ -34,6 +34,12 @@ public class UsuarioService {
         return usuarioRepository.existsById(id);
     }
 
+    public boolean isExitsAccountWithEmail (String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email).orElse(null);
+
+        return usuario != null;
+    }
+
     public void updateUserAvatarPath (Long userId, String filename) {
         String avatarUrl = "/files/avatars/" + filename;
 

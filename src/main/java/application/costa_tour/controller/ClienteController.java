@@ -3,6 +3,7 @@ package application.costa_tour.controller;
 import application.costa_tour.dto.ClienteCreateDTO;
 import application.costa_tour.dto.ClienteDTO;
 import application.costa_tour.dto.mapper.ClienteCreateMapper;
+import application.costa_tour.exception.AdminAlreadyExistException;
 import application.costa_tour.exception.ClientAlredyExistException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.model.Cliente;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/client")
-@Validated
 public class ClienteController {
 
     @Autowired
@@ -46,6 +46,10 @@ public class ClienteController {
 
         if (clienteService.isExistingClient(clienteDto.getDni())) {
             throw new ClientAlredyExistException("Client already exist.");
+        }
+
+        if (usuarioService.isExitsAccountWithEmail(clienteDto.getEmail())) {
+            throw new AdminAlreadyExistException("An account associated with an email already exists");
         }
 
         if (!tipoDocumentoService.isExistDocType(clienteDto.getIdTipoDocumento())) {
