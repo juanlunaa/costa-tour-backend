@@ -60,4 +60,47 @@ public class PlanController {
                         .build(),
                 HttpStatus.OK);
     }
+
+    @PutMapping("/update/{idPlan}")
+    public ResponseEntity<?> updatePlan (
+            @PathVariable("idPlan") Long idPlan,
+            @ModelAttribute PlanCreateDTO planCreateDTO
+    ) {
+
+        Plan plan = PlanCreateMapper.mapper.planCreateDtoToPlan(planCreateDTO);
+        Plan prevPlan = planService.getPlanEntity(idPlan);
+        String prevPlanName = prevPlan.getNombre();
+
+        plan.getUbicacion().setId(prevPlan.getUbicacion().getId());
+        planService.updatePlan(idPlan, plan);
+
+        String rutaImagenes = storageService.updatePlanImages(idPlan, prevPlanName, plan.getNombre(), planCreateDTO.getImagenesFiles());
+
+        plan.setImagenes(rutaImagenes);
+        plan.setImagenCard(rutaImagenes.split(";")[planCreateDTO.getMiniaturaSelect()]);
+
+        planService.updatePlan(idPlan, plan);
+
+        return new ResponseEntity<>(
+                SuccessResponse
+                        .builder()
+                        .message("Plan updated successfully")
+                        .build(),
+                HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/{idPlan}")
+    public ResponseEntity<?> deletePlan (@PathVariable("idPlan") Long idPlan) {
+
+        String planName = planService.getPlan(idPlan).getNombre();
+        planService.deletePlan(idPlan);
+        storageService.deleteFolderPlan(idPlan, planName);
+
+        return new ResponseEntity<>(
+                SuccessResponse
+                        .builder()
+                        .message("Plan deleted successfully")
+                        .build(),
+                HttpStatus.OK);
+    }
 }

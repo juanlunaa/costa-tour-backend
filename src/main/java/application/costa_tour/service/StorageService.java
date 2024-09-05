@@ -7,14 +7,13 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.nio.file.*;
 
 @Service
 public class StorageService {
@@ -54,6 +53,39 @@ public class StorageService {
         }
 
         return pathImages;
+    }
+
+    public String updatePlanImages (Long idPlan, String prevPlanName, String planName, List<MultipartFile> images) {
+        boolean isSameName = prevPlanName.equalsIgnoreCase(planName);
+
+        if (!isSameName) {
+            String prevFullPathImages = String.format("%s/%s-%s", plansLocation, prevPlanName.toLowerCase().replace(' ', '-'), idPlan);
+            File folder = new File(prevFullPathImages);
+            deleteFilesToFolder(folder);
+            folder.delete();
+        } else {
+            String prevFullPathImages = String.format("%s/%s-%s", plansLocation, planName.toLowerCase().replace(' ', '-'), idPlan);
+            File folder = new File(prevFullPathImages);
+            deleteFilesToFolder(folder);
+        }
+
+        return savePlanImages(idPlan, planName,images);
+    }
+
+    private void deleteFilesToFolder (File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                file.delete();
+            }
+        }
+    }
+
+    public void deleteFolderPlan (Long idPlan, String planName) {
+        String prevFullPathImages = String.format("%s/%s-%s", plansLocation, planName.toLowerCase().replace(' ', '-'), idPlan);
+        File folder = new File(prevFullPathImages);
+        deleteFilesToFolder(folder);
+        folder.delete();
     }
 
     private void saveFile (String filesLocation, MultipartFile file, String filename) {

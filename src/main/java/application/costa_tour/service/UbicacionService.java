@@ -14,4 +14,14 @@ public class UbicacionService {
     public void createUbicacion (Ubicacion ubicacion) {
         ubicacionRepository.save(ubicacion);
     }
+
+    public void updateUbicacion (Long id, Ubicacion ubicacion) {
+        Ubicacion previousUbicacion = ubicacionRepository.findById(id).orElse(null);
+
+        previousUbicacion.setLatitud(ubicacion.getLatitud());
+        previousUbicacion.setLongitud(ubicacion.getLongitud());
+        previousUbicacion.setDireccion(ubicacion.getDireccion());
+
+        ubicacionRepository.save(previousUbicacion);
+    }
 }

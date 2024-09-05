@@ -27,7 +27,29 @@ public class PlanService {
         return PlanMapper.mapper.plansToPlanDtos(planRepository.findAll());
     }
 
+    public Plan getPlanEntity (Long id) {
+        return planRepository.findById(id).orElse(null);
+    }
+
     public Long createPlan (Plan plan) {
         return planRepository.save(plan).getId();
+    }
+
+    public void updatePlan (Long id, Plan plan) {
+        Plan previousPlan = planRepository.findById(id).orElse(null);
+
+        previousPlan.setNombre(plan.getNombre());
+        previousPlan.setDescripcion(plan.getDescripcion());
+        previousPlan.setCategoria(plan.getCategoria());
+        previousPlan.setRangoPrecio(plan.getRangoPrecio());
+        previousPlan.setUbicacion(plan.getUbicacion());
+        previousPlan.setImagenCard(plan.getImagenCard());
+        previousPlan.setImagenes(plan.getImagenes());
+
+        planRepository.save(previousPlan);
+    }
+
+    public void deletePlan (Long id) {
+        planRepository.deleteById(id);
     }
 }
