@@ -25,11 +25,33 @@ public class MediaController {
     @Value("${uploadfiles.avatar.location}")
     private String avatarsLocation;
 
+    @Value("${uploadfiles.plans.location}")
+    private String plansLocation;
+
     @GetMapping("/avatars/{filename:.+}")
-    public ResponseEntity<Resource> getResource (
-            @PathVariable String filename
+    public ResponseEntity<Resource> getAvatar (
+            @PathVariable("filename") String filename
     ) throws IOException {
         Resource file = storageService.loadFile(avatarsLocation + "/" + filename);
+
+        if (file == null) {
+            throw new ResourceNotFoundException("Resource not found");
+        }
+
+        String contentType = Files.probeContentType(file.getFile().toPath());
+
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .body(file);
+    }
+
+    @GetMapping("/planes/{namePlan}/{filename:.+}")
+    public ResponseEntity<Resource> getPlanImage (
+            @PathVariable("namePlan") String namePlan,
+            @PathVariable("filename") String filename
+    ) throws IOException {
+        Resource file = storageService.loadFile(plansLocation + "/" + namePlan + "/" + filename);
 
         if (file == null) {
             throw new ResourceNotFoundException("Resource not found");

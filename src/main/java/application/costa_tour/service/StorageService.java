@@ -14,12 +14,16 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 @Service
 public class StorageService {
 
     @Value("${uploadfiles.avatar.location}")
     private String avatarsLocation;
+
+    @Value("${uploadfiles.plans.location}")
+    private String plansLocation;
 
     public String saveAvatar (Long userId, MultipartFile file) {
         String filename = String
@@ -30,7 +34,29 @@ public class StorageService {
         return filename;
     }
 
-    public void saveFile (String filesLocation, MultipartFile file, String filename) {
+    public String savePlanImages (Long idPlan, String planName, List<MultipartFile> images) {
+        String pathImages = "";
+        String planNameFormat = planName.toLowerCase().replace(' ', '-');
+        String fullPathSaveImages = String.format("%s/%s-%s", plansLocation, planNameFormat, idPlan);
+
+        for (int i = 0; i < images.size(); i++) {
+            String filename = String
+                    .format("%s-%s%s", planNameFormat, (i+1), getFileExtension(images.get(i).getOriginalFilename()));
+
+            saveFile(fullPathSaveImages, images.get(i), filename);
+
+            if (images.size() - i == 1) {
+                pathImages += String.format("/files/planes/%s-%s/%s", planNameFormat, idPlan, filename);
+                break;
+            }
+
+            pathImages += String.format("/files/planes/%s-%s/%s;", planNameFormat, idPlan, filename);
+        }
+
+        return pathImages;
+    }
+
+    private void saveFile (String filesLocation, MultipartFile file, String filename) {
         try{
             Path rootLocation = Paths.get(filesLocation);
             Files.createDirectories(rootLocation);
