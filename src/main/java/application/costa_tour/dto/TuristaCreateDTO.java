@@ -24,6 +24,6 @@ public class TuristaCreateDTO {
     private String email;
     @NotEmpty
     private String password;
-//    @NotNull
-//    private Long idCiudad;
+    @NotNull
+    private Long idCiudad;
 }

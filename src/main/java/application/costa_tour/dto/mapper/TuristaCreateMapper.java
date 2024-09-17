@@ -13,6 +13,6 @@ public interface TuristaCreateMapper {
 
     @Mapping(source = "email", target = "usuario.email")
     @Mapping(source = "password", target = "usuario.password")
-//    @Mapping(source = "idCiudad", target = "ciudad.id")
+    @Mapping(source = "idCiudad", target = "ciudad.id")
     Turista turistaCreateDtoToTurista(TuristaCreateDTO turistaCreateDto);
 }

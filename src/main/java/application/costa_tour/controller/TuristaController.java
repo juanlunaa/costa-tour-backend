@@ -47,9 +47,9 @@ public class TuristaController {
             throw new AdminAlreadyExistException("An account associated with an email already exists");
         }
 
-//        if (!ciudadService.isExitsCity(turistaDTO.getIdCiudad())) {
-//            throw new ResourceNotFoundException("City not found to id=" + turistaDTO.getIdCiudad());
-//        }
+        if (!ciudadService.isExitsCity(turistaDTO.getIdCiudad())) {
+            throw new ResourceNotFoundException("City not found to id=" + turistaDTO.getIdCiudad());
+        }
 
         Turista turista = TuristaCreateMapper.mapper.turistaCreateDtoToTurista(turistaDTO);
 
