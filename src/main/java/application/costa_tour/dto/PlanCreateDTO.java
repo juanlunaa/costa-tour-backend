@@ -27,5 +27,6 @@ public class PlanCreateDTO {
     private String direccion;
     @NotNull
     private int miniaturaSelect;
-
+    @NotEmpty
+    private List<Long> caracteristicas;
 }

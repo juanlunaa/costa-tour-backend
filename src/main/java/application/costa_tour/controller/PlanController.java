@@ -3,10 +3,10 @@ package application.costa_tour.controller;
 import application.costa_tour.dto.PlanCreateDTO;
 import application.costa_tour.dto.mapper.PlanCreateMapper;
 import application.costa_tour.exception.SuccessResponse;
+import application.costa_tour.model.Caracteristica;
+import application.costa_tour.model.CaracteristicaPlan;
 import application.costa_tour.model.Plan;
-import application.costa_tour.service.PlanService;
-import application.costa_tour.service.StorageService;
-import application.costa_tour.service.UbicacionService;
+import application.costa_tour.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,12 +14,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/plan")
 public class PlanController {
 
     @Autowired
     private PlanService planService;
+
+    @Autowired
+    private CaracteristicaPlanService caracteristicaPlanService;
+
+    @Autowired
+    private CaracteristicaService caracteristicaService;
 
     @Autowired
     private UbicacionService ubicacionService;
@@ -52,6 +61,18 @@ public class PlanController {
         plan.setImagenCard(rutaImagenes.split(";")[planCreateDTO.getMiniaturaSelect()]);
 
         planService.createPlan(plan);
+
+        List<CaracteristicaPlan> caracteristicasPlan = new ArrayList<>();
+
+        planCreateDTO.getCaracteristicas().forEach(c -> {
+            CaracteristicaPlan caracteristicaPlan = new CaracteristicaPlan();
+
+            caracteristicaPlan.setPlan(plan);
+            caracteristicaPlan.setCaracteristica(caracteristicaService.getCaracteristica(c));
+            caracteristicasPlan.add(caracteristicaPlan);
+        });
+
+        caracteristicaPlanService.createAllCaracteristicasPlan(caracteristicasPlan);
 
         return new ResponseEntity<>(
                 SuccessResponse
@@ -93,6 +114,7 @@ public class PlanController {
     public ResponseEntity<?> deletePlan (@PathVariable("idPlan") Long idPlan) {
 
         String planName = planService.getPlan(idPlan).getNombre();
+        caracteristicaPlanService.deleteAllCaracteristicasPlanFromPlan(idPlan);
         planService.deletePlan(idPlan);
         storageService.deleteFolderPlan(idPlan, planName);
 
