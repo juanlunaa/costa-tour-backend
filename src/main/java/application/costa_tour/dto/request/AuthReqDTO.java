@@ -8,7 +8,7 @@ import org.hibernate.validator.constraints.Length;
 public class AuthReqDTO {
     @NotEmpty
     private String email;
-    @Length(min = 8, max = 16)
+//    @Length(min = 8, max = 16)
     @NotEmpty
     private String password;
 }

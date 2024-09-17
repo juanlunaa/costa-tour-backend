@@ -5,10 +5,7 @@ import application.costa_tour.dto.request.UpdateAvatarReqDTO;
 import application.costa_tour.exception.*;
 import application.costa_tour.model.enums.UserRole;
 import application.costa_tour.model.Usuario;
-import application.costa_tour.service.AdministradorService;
-import application.costa_tour.service.TuristaService;
-import application.costa_tour.service.StorageService;
-import application.costa_tour.service.UsuarioService;
+import application.costa_tour.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,6 +29,9 @@ public class UserController {
     @Autowired
     private AdministradorService administradorService;
 
+    @Autowired
+    private AliadoService aliadoService;
+
     @PostMapping("/auth")
     public ResponseEntity<?> loginUser (
             @ModelAttribute @Valid AuthReqDTO authReq
@@ -50,6 +50,13 @@ public class UserController {
             return new ResponseEntity<>(
                 administradorService.getAdminByUser(user),
                 HttpStatus.OK
+            );
+        }
+
+        if (user.getTipo().equals(UserRole.ALIADO)) {
+            return new ResponseEntity<>(
+                    aliadoService.getAliadoByUser(user),
+                    HttpStatus.OK
             );
         }
 
