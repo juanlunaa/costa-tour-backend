@@ -9,11 +9,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.util.Date;
 
 @Data
-public class ClienteCreateDTO {
+public class TuristaCreateDTO {
     @NotEmpty
     private String dni;
-    @NotNull
-    private Long idTipoDocumento;
     @NotEmpty
     private String nombre;
     @NotEmpty
@@ -26,8 +24,6 @@ public class ClienteCreateDTO {
     private String email;
     @NotEmpty
     private String password;
-    @NotEmpty
-    private String telefono;
-    @NotNull
-    private Long idCiudad;
+//    @NotNull
+//    private Long idCiudad;
 }

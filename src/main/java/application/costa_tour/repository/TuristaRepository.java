@@ -1,6 +1,6 @@
 package application.costa_tour.repository;
 
-import application.costa_tour.model.Cliente;
+import application.costa_tour.model.Turista;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -8,8 +8,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ClienteRepository extends JpaRepository<Cliente, String> {
+public interface TuristaRepository extends JpaRepository<Turista, String> {
 
-    @Query("SELECT c FROM Cliente c WHERE c.usuario.id = ?1 ")
-    Optional<Cliente> findClienteByUsuarioId (Long userId);
+    @Query("SELECT t FROM Turista t WHERE t.usuario.id = ?1 ")
+    Optional<Turista> findTuristaByUsuarioId (Long userId);
 }

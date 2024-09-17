@@ -27,7 +27,7 @@ public class ClientePlan {
 
     @ManyToOne
     @JoinColumn(name="dni_cliente")
-    private Cliente cliente;
+    private Turista cliente;
 
     @ManyToOne
     @JoinColumn(name="id_plan")

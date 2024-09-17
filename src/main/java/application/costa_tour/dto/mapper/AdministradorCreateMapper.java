@@ -11,9 +11,6 @@ public interface AdministradorCreateMapper {
 
     AdministradorCreateMapper mapper = Mappers.getMapper(AdministradorCreateMapper.class);
 
-    @Mapping(source = "nombre", target = "usuario.nombre")
-    @Mapping(source = "apellido", target = "usuario.apellido")
-    @Mapping(source = "telefono", target = "usuario.telefono")
     @Mapping(source = "email", target = "usuario.email")
     @Mapping(source = "password", target = "usuario.password")
     Administrador administradorCreateDtoToAdministrador (AdministradorCreateDTO administradorCreateDTO);

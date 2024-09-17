@@ -1,14 +1,12 @@
 package application.costa_tour.controller;
 
 import application.costa_tour.dto.AdministradorCreateDTO;
-import application.costa_tour.dto.AdministradorDTO;
 import application.costa_tour.dto.mapper.AdministradorCreateMapper;
 import application.costa_tour.exception.AdminAlreadyExistException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.exception.SuccessResponse;
-import application.costa_tour.model.AdminRole;
 import application.costa_tour.model.Administrador;
-import application.costa_tour.model.UserRole;
+import application.costa_tour.model.enums.UserRole;
 import application.costa_tour.service.AdministradorService;
 import application.costa_tour.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -32,10 +30,6 @@ public class AdministradorController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createBasicAdmin (@ModelAttribute @Valid AdministradorCreateDTO adminDto) {
-
-        if (!(adminDto.getRol().equals(AdminRole.ADMIN) || adminDto.getRol().equals(AdminRole.SUPERADMIN))) {
-            throw new ResourceNotFoundException("Admin role not found to adminRole=" + adminDto.getRol());
-        }
 
         if (usuarioService.isExitsAccountWithEmail(adminDto.getEmail())) {
             throw new AdminAlreadyExistException("An account associated with an email already exists");

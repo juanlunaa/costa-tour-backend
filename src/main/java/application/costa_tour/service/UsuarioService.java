@@ -6,7 +6,6 @@ import application.costa_tour.model.Usuario;
 import application.costa_tour.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 @Service
 public class UsuarioService {
@@ -26,7 +25,7 @@ public class UsuarioService {
     }
 
     public void createUser (Usuario usuario) {
-        usuario.setImagenPerfil("/files/avatars/avatar-default.png");
+        usuario.setFotoPerfil("/files/avatars/avatar-default.png");
         usuarioRepository.save(usuario);
     }
 
@@ -45,7 +44,7 @@ public class UsuarioService {
 
         Usuario usuario = usuarioRepository.findById(userId).orElse(null);
 
-        usuario.setImagenPerfil(avatarUrl);
+        usuario.setFotoPerfil(avatarUrl);
 
         usuarioRepository.save(usuario);
     }

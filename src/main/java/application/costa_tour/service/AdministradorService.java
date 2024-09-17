@@ -19,7 +19,7 @@ public class AdministradorService {
         Administrador admin = administradorRepository.findAdministradorByUsuarioId(user.getId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(String
-                                .format("Administrator not found for user=%s %s", user.getNombre(), user.getApellido())));
+                                .format("Administrator not found for user id=%s", user.getId())));
 
         return AdministradorMapper.mapper.administradorToAdministradorDto(admin);
     }

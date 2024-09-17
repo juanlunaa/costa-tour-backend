@@ -11,25 +11,27 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "cliente")
-public class Cliente{
+@Table(name = "turista")
+public class Turista {
     @Id
-    @Column(name = "dni_cliente")
+    @Column(name = "dni_turista")
     private String dni;
 
-    @Column(name = "fecha_nacimiento_cliente")
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "apellido")
+    private String apellido;
+
+    @Column(name = "fecha_nacimiento")
     private Date fechaNacimiento;
 
-    @Column(name = "edad_cliente")
+    @Column(name = "edad")
     private Integer edad;
 
     @ManyToOne
     @JoinColumn(name = "id_ciudad")
     private Ciudad ciudad;
-
-    @ManyToOne
-    @JoinColumn(name="id_tipo_documento")
-    private TipoDocumento tipoDocumento;
 
     @OneToOne
     @JoinColumn(name="id_usuario")

@@ -13,11 +13,8 @@ public interface AdministradorMapper {
 
     @Mapping(source = "usuario.id", target = "userId")
     @Mapping(source = "usuario.tipo", target = "tipoUsuario")
-    @Mapping(source = "usuario.nombre", target = "nombre")
-    @Mapping(source = "usuario.apellido", target = "apellido")
     @Mapping(source = "usuario.email", target = "email")
-    @Mapping(source = "usuario.telefono", target = "telefono")
-    @Mapping(source = "usuario.imagenPerfil", target = "avatar")
+    @Mapping(source = "usuario.fotoPerfil", target = "avatar")
     AdministradorDTO administradorToAdministradorDto (Administrador administrador);
 
 }

@@ -1,5 +1,6 @@
 package application.costa_tour.model;
 
+import application.costa_tour.model.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,25 +17,16 @@ public class Usuario {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "email")
+    private String email;
+
+    @Column(name = "password")
+    private String password;
+
+    @Column(name = "foto_perfil")
+    private String fotoPerfil;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_usuario")
     private UserRole tipo;
-
-    @Column(name = "nombre_usuario")
-    private String nombre;
-
-    @Column(name = "apellido_usuario")
-    private String apellido;
-
-    @Column(name = "email_usuario")
-    private String email;
-
-    @Column(name = "telefono_usuario")
-    private String telefono;
-
-    @Column(name = "password_usuario")
-    private String password;
-
-    @Column(name = "image_perfil_usuario")
-    private String imagenPerfil;
 }

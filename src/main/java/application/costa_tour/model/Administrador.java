@@ -16,9 +16,11 @@ public class Administrador{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "rol_administrador")
-    private AdminRole rol;
+    @Column(name = "nombre")
+    private String nombre;
+
+    @Column(name = "apellido")
+    private String apellido;
 
     @OneToOne
     @JoinColumn(name="id_usuario")

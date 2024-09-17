@@ -3,10 +3,10 @@ package application.costa_tour.controller;
 import application.costa_tour.dto.request.AuthReqDTO;
 import application.costa_tour.dto.request.UpdateAvatarReqDTO;
 import application.costa_tour.exception.*;
-import application.costa_tour.model.UserRole;
+import application.costa_tour.model.enums.UserRole;
 import application.costa_tour.model.Usuario;
 import application.costa_tour.service.AdministradorService;
-import application.costa_tour.service.ClienteService;
+import application.costa_tour.service.TuristaService;
 import application.costa_tour.service.StorageService;
 import application.costa_tour.service.UsuarioService;
 import jakarta.validation.Valid;
@@ -27,7 +27,7 @@ public class UserController {
     private StorageService storageService;
 
     @Autowired
-    private ClienteService clienteService;
+    private TuristaService clienteService;
 
     @Autowired
     private AdministradorService administradorService;
@@ -39,9 +39,9 @@ public class UserController {
 
         Usuario user = usuarioService.credentialsValidate(authReq.getEmail(), authReq.getPassword());
 
-        if (user.getTipo().equals(UserRole.CLIENTE)) {
+        if (user.getTipo().equals(UserRole.TURISTA)) {
             return new ResponseEntity<>(
-                clienteService.getClientByUser(user),
+                clienteService.getTuristaByUser(user),
                 HttpStatus.OK
             );
         }
