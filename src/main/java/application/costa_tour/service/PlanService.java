@@ -31,8 +31,8 @@ public class PlanService {
         return planRepository.findById(id).orElse(null);
     }
 
-    public Long createPlan (Plan plan) {
-        return planRepository.save(plan).getId();
+    public Plan createPlan (Plan plan) {
+        return planRepository.save(plan);
     }
 
     public void updatePlan (Long id, Plan plan) {
@@ -41,9 +41,10 @@ public class PlanService {
         previousPlan.setNombre(plan.getNombre());
         previousPlan.setDescripcion(plan.getDescripcion());
         previousPlan.setCategoria(plan.getCategoria());
-        previousPlan.setRangoPrecio(plan.getRangoPrecio());
+        previousPlan.setRangoMinDinero(plan.getRangoMinDinero());
+        previousPlan.setRangoMaxDinero(plan.getRangoMaxDinero());
         previousPlan.setUbicacion(plan.getUbicacion());
-        previousPlan.setImagenCard(plan.getImagenCard());
+        previousPlan.setImagenMiniatura(plan.getImagenMiniatura());
         previousPlan.setImagenes(plan.getImagenes());
 
         planRepository.save(previousPlan);

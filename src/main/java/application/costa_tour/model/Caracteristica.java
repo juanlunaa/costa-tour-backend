@@ -2,8 +2,10 @@ package application.costa_tour.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = "caracteristica")
 public class Caracteristica {
@@ -12,6 +14,10 @@ public class Caracteristica {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "descripcion_caracteristica")
-    private String descripcion;
+    @Column(name = "palabra_clave")
+    private String palabraClave;
+
+    public Caracteristica(Long id) {
+        this.id = id;
+    }
 }

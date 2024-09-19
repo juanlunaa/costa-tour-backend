@@ -24,4 +24,10 @@ public class Ubicacion {
 
     @Column(name="direccion_ubicacion")
     private String direccion;
+
+    public Ubicacion(float latitud, float longitud, String direccion) {
+        this.latitud = latitud;
+        this.longitud = longitud;
+        this.direccion = direccion;
+    }
 }

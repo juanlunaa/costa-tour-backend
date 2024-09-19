@@ -1,5 +1,6 @@
 package application.costa_tour.dto;
 
+import application.costa_tour.model.enums.PlanCategory;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -13,10 +14,12 @@ public class PlanCreateDTO {
     private String nombre;
     @NotEmpty
     private String descripcion;
+    @NotNull
+    private PlanCategory categoria;
     @NotEmpty
-    private String categoria;
+    private String rangoMinDinero;
     @NotEmpty
-    private String rangoPrecio;
+    private String rangoMaxDinero;
     @NotNull
     private List<MultipartFile> imagenesFiles;
     @NotNull

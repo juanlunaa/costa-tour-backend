@@ -3,9 +3,7 @@ package application.costa_tour.controller;
 import application.costa_tour.dto.PlanCreateDTO;
 import application.costa_tour.dto.mapper.PlanCreateMapper;
 import application.costa_tour.exception.SuccessResponse;
-import application.costa_tour.model.Caracteristica;
-import application.costa_tour.model.CaracteristicaPlan;
-import application.costa_tour.model.Plan;
+import application.costa_tour.model.*;
 import application.costa_tour.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/plan")
@@ -46,33 +45,35 @@ public class PlanController {
         return ResponseEntity.ok(planService.getPlan(id));
     }
 
+
+    // falta añadir el tema de los hechos para los planes de categoria SITIOS_TURISTICOS
     @PostMapping("/create")
     public ResponseEntity<?> createPlan (@ModelAttribute @Valid PlanCreateDTO planCreateDTO) {
 
         Plan plan = PlanCreateMapper.mapper.planCreateDtoToPlan(planCreateDTO);
 
+        List<CaracteristicaPlan> caracteristicasPlan = planCreateDTO.getCaracteristicas()
+                .stream()
+                .map(c -> new CaracteristicaPlan(
+                            plan,
+                            new Caracteristica(c)))
+                .collect(Collectors.toList());
+
+        plan.setCaracteristicasPlan(caracteristicasPlan);
+
         ubicacionService.createUbicacion(plan.getUbicacion());
-        Long idPlan = planService.createPlan(plan);
 
-        String rutaImagenes = storageService.savePlanImages(idPlan, planCreateDTO.getNombre(), planCreateDTO.getImagenesFiles());
+        Plan newPlan = planService.createPlan(plan);
 
-        plan.setId(idPlan);
-        plan.setImagenes(rutaImagenes);
-        plan.setImagenCard(rutaImagenes.split(";")[planCreateDTO.getMiniaturaSelect()]);
+        List<String> urls = storageService.savePlanImages(newPlan.getId(), planCreateDTO.getNombre(), planCreateDTO.getImagenesFiles());
+        List<ImagenPlan> imagenPlanList = urls.stream()
+                .map(url -> new ImagenPlan(url))
+                .collect(Collectors.toList());
 
-        planService.createPlan(plan);
+        newPlan.setImagenes(imagenPlanList);
+        newPlan.setImagenMiniatura(urls.get(planCreateDTO.getMiniaturaSelect()));
 
-        List<CaracteristicaPlan> caracteristicasPlan = new ArrayList<>();
-
-        planCreateDTO.getCaracteristicas().forEach(c -> {
-            CaracteristicaPlan caracteristicaPlan = new CaracteristicaPlan();
-
-            caracteristicaPlan.setPlan(plan);
-            caracteristicaPlan.setCaracteristica(caracteristicaService.getCaracteristica(c));
-            caracteristicasPlan.add(caracteristicaPlan);
-        });
-
-        caracteristicaPlanService.createAllCaracteristicasPlan(caracteristicasPlan);
+        planService.createPlan(newPlan);
 
         return new ResponseEntity<>(
                 SuccessResponse
@@ -92,15 +93,38 @@ public class PlanController {
         Plan prevPlan = planService.getPlanEntity(idPlan);
         String prevPlanName = prevPlan.getNombre();
 
-        plan.getUbicacion().setId(prevPlan.getUbicacion().getId());
-        planService.updatePlan(idPlan, plan);
+        prevPlan.setNombre(planCreateDTO.getNombre());
+        prevPlan.setDescripcion(planCreateDTO.getDescripcion());
+        prevPlan.setCategoria(planCreateDTO.getCategoria());
+        prevPlan.setRangoMinDinero(planCreateDTO.getRangoMinDinero());
+        prevPlan.setRangoMaxDinero(planCreateDTO.getRangoMaxDinero());
 
-        String rutaImagenes = storageService.updatePlanImages(idPlan, prevPlanName, plan.getNombre(), planCreateDTO.getImagenesFiles());
+        prevPlan.getUbicacion().setLatitud(planCreateDTO.getLatitud());
+        prevPlan.getUbicacion().setLongitud(planCreateDTO.getLongitud());
+        prevPlan.getUbicacion().setDireccion(planCreateDTO.getDireccion());
 
-        plan.setImagenes(rutaImagenes);
-        plan.setImagenCard(rutaImagenes.split(";")[planCreateDTO.getMiniaturaSelect()]);
+        // falta añadir que compare las caracteristicas nuevas con las que estaban antes
+        // para no estar consumiendo ids de la bd innecesariamente
+        prevPlan.getCaracteristicasPlan().clear();
+        planCreateDTO.getCaracteristicas()
+                .forEach(c -> {
+                    prevPlan.getCaracteristicasPlan().add(new CaracteristicaPlan(
+                            prevPlan,
+                            new Caracteristica(c)
+                    ));
+                });
 
-        planService.updatePlan(idPlan, plan);
+        // lo mismo de las caracteristicas añadirlo aca
+        prevPlan.getImagenes().clear();
+
+        List<String> urls = storageService.updatePlanImages(idPlan, prevPlanName, plan.getNombre(), planCreateDTO.getImagenesFiles());
+        urls.forEach(url -> {
+            prevPlan.getImagenes().add(new ImagenPlan(url));
+        });
+
+        prevPlan.setImagenMiniatura(urls.get(planCreateDTO.getMiniaturaSelect()));
+
+        planService.updatePlan(idPlan, prevPlan);
 
         return new ResponseEntity<>(
                 SuccessResponse
@@ -114,7 +138,6 @@ public class PlanController {
     public ResponseEntity<?> deletePlan (@PathVariable("idPlan") Long idPlan) {
 
         String planName = planService.getPlan(idPlan).getNombre();
-        caracteristicaPlanService.deleteAllCaracteristicasPlanFromPlan(idPlan);
         planService.deletePlan(idPlan);
         storageService.deleteFolderPlan(idPlan, planName);
 

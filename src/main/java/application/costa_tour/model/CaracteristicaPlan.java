@@ -2,8 +2,10 @@ package application.costa_tour.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 @Entity
 @Table(name = "caracteristica_plan")
 public class CaracteristicaPlan {
@@ -19,4 +21,9 @@ public class CaracteristicaPlan {
     @ManyToOne
     @JoinColumn(name = "id_caracteristica")
     private Caracteristica caracteristica;
+
+    public CaracteristicaPlan(Plan plan, Caracteristica caracteristica) {
+        this.plan = plan;
+        this.caracteristica = caracteristica;
+    }
 }

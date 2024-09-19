@@ -11,6 +11,10 @@ public class UbicacionService {
     @Autowired
     UbicacionRepository ubicacionRepository;
 
+    public Ubicacion getUbicacionEntity(Long id) {
+        return ubicacionRepository.findById(id).orElse(null);
+    }
+
     public void createUbicacion (Ubicacion ubicacion) {
         ubicacionRepository.save(ubicacion);
     }
@@ -23,5 +27,6 @@ public class UbicacionService {
         previousUbicacion.setDireccion(ubicacion.getDireccion());
 
         ubicacionRepository.save(previousUbicacion);
+        System.out.println(previousUbicacion.getId() + "<--");
     }
 }

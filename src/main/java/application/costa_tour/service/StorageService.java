@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.List;
 import java.nio.file.*;
 
@@ -33,8 +34,8 @@ public class StorageService {
         return filename;
     }
 
-    public String savePlanImages (Long idPlan, String planName, List<MultipartFile> images) {
-        String pathImages = "";
+    public List<String> savePlanImages (Long idPlan, String planName, List<MultipartFile> images) {
+        List<String> urls = new ArrayList<>();
         String planNameFormat = planName.toLowerCase().replace(' ', '-');
         String fullPathSaveImages = String.format("%s/%s-%s", plansLocation, planNameFormat, idPlan);
 
@@ -44,18 +45,13 @@ public class StorageService {
 
             saveFile(fullPathSaveImages, images.get(i), filename);
 
-            if (images.size() - i == 1) {
-                pathImages += String.format("/files/planes/%s-%s/%s", planNameFormat, idPlan, filename);
-                break;
-            }
-
-            pathImages += String.format("/files/planes/%s-%s/%s;", planNameFormat, idPlan, filename);
+            urls.add(String.format("/files/planes/%s-%s/%s", planNameFormat, idPlan, filename));
         }
 
-        return pathImages;
+        return urls;
     }
 
-    public String updatePlanImages (Long idPlan, String prevPlanName, String planName, List<MultipartFile> images) {
+    public List<String> updatePlanImages (Long idPlan, String prevPlanName, String planName, List<MultipartFile> images) {
         boolean isSameName = prevPlanName.equalsIgnoreCase(planName);
 
         if (!isSameName) {

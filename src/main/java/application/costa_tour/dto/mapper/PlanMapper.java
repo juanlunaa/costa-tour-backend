@@ -1,7 +1,10 @@
 package application.costa_tour.dto.mapper;
 
+import application.costa_tour.dto.CaracteristicaPlanDTO;
+import application.costa_tour.dto.HechoPlanDTO;
 import application.costa_tour.dto.PlanDTO;
 import application.costa_tour.dto.UbicacionDTO;
+import application.costa_tour.model.CaracteristicaPlan;
 import application.costa_tour.model.Plan;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -9,6 +12,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper
 public interface PlanMapper {
@@ -28,27 +32,43 @@ public interface PlanMapper {
         planDto.setNombre(plan.getNombre());
         planDto.setDescripcion(plan.getDescripcion());
         planDto.setCategoria(plan.getCategoria());
-        planDto.setRangoPrecio(plan.getRangoPrecio());
-        planDto.setMiniatura(plan.getImagenCard());
+        planDto.setRangoMinDinero(plan.getRangoMinDinero());
+        planDto.setRangoMaxDinero(plan.getRangoMaxDinero());
+        planDto.setMiniatura(plan.getImagenMiniatura());
 
-        List<String> imagenes = new ArrayList<>();
+        planDto.setImagenes(
+                plan.getImagenes()
+                        .stream()
+                        .map(i -> {
+                            return i.getUrl();
+                        })
+                        .collect(Collectors.toList())
+        );
 
-        //Separo las imagenes que estan juntas en un solo String para añadirlas a un Array
+        planDto.setHechos(
+                plan.getHechos()
+                        .stream()
+                        .map(h -> {
+                            return new HechoPlanDTO(h.getId(), h.getDecripcion());
+                        })
+                        .collect(Collectors.toList())
+        );
 
-        Arrays
-            .asList(plan.getImagenes().split(";"))
-            .forEach(i -> {
-                imagenes.add(i);
-            });
+        planDto.setCaracteristicas(
+                plan.getCaracteristicasPlan()
+                        .stream()
+                        .map(c -> {
+                            return new CaracteristicaPlanDTO(c.getCaracteristica().getId(), c.getCaracteristica().getPalabraClave());
+                        })
+                        .collect(Collectors.toList()));
 
-        planDto.setImagenes(imagenes);
 
-        UbicacionDTO ubicacionDto = new UbicacionDTO();
-
-        ubicacionDto.setId(plan.getUbicacion().getId());
-        ubicacionDto.setLatitud(plan.getUbicacion().getLatitud());
-        ubicacionDto.setLongitud(plan.getUbicacion().getLongitud());
-        ubicacionDto.setDireccion(plan.getUbicacion().getDireccion());
+        UbicacionDTO ubicacionDto = new UbicacionDTO(
+//                plan.getUbicacion().getId(),
+                plan.getUbicacion().getLatitud(),
+                plan.getUbicacion().getLongitud(),
+                plan.getUbicacion().getDireccion()
+        );
 
         planDto.setUbicacion(ubicacionDto);
 

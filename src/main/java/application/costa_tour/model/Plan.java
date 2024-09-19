@@ -1,9 +1,12 @@
 package application.costa_tour.model;
 
+import application.costa_tour.model.enums.PlanCategory;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -16,25 +19,37 @@ public class Plan {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre_plan")
+    @Column(name = "nombre")
     private String nombre;
 
-    @Column(name = "descripcion_plan")
+    @Column(name = "descripcion")
     private String descripcion;
 
-    @Column(name = "categoria_plan")
-    private String categoria;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria")
+    private PlanCategory categoria;
 
-    @Column(name = "rango_precio_plan")
-    private String rangoPrecio;
+    @Column(name = "rango_min_dinero")
+    private String rangoMinDinero;
 
-    @Column(name = "imagen_card_plan")
-    private String imagenCard;
+    @Column(name = "rango_max_dinero")
+    private String rangoMaxDinero;
 
-    @Column(name = "imagenes_plan")
-    private String imagenes;
+    @Column(name = "imagen_miniatura")
+    private String imagenMiniatura;
 
-    @OneToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_ubicacion")
     private Ubicacion ubicacion;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_plan")
+    private List<ImagenPlan> imagenes;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "id_plan")
+    private List<HechoPlan> hechos;
+
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CaracteristicaPlan> caracteristicasPlan;
 }
