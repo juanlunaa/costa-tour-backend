@@ -13,6 +13,10 @@ public class CaracteristicaPlanService {
     @Autowired
     private CaracteristicaPlanRepository caracteristicaPlanRepository;
 
+    public List<CaracteristicaPlan> getCaracteristicasPlanByIdPlan(Long idPlan) {
+        return caracteristicaPlanRepository.findCaracteristicaPlanListByPlanId(idPlan);
+    }
+
     public void createAllCaracteristicasPlan (List<CaracteristicaPlan> caracteristicaPlanList) {
         caracteristicaPlanRepository.saveAll(caracteristicaPlanList);
     }

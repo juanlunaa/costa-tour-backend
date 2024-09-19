@@ -2,6 +2,7 @@ package application.costa_tour.controller;
 
 import application.costa_tour.dto.PlanCreateDTO;
 import application.costa_tour.dto.mapper.PlanCreateMapper;
+import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.exception.SuccessResponse;
 import application.costa_tour.model.*;
 import application.costa_tour.service.*;
@@ -89,42 +90,23 @@ public class PlanController {
             @ModelAttribute PlanCreateDTO planCreateDTO
     ) {
 
+        if (!planService.isPlanExists(idPlan)) {
+            throw new ResourceNotFoundException(String
+                    .format("Plan not found for id=%s", idPlan));
+        }
+
         Plan plan = PlanCreateMapper.mapper.planCreateDtoToPlan(planCreateDTO);
-        Plan prevPlan = planService.getPlanEntity(idPlan);
-        String prevPlanName = prevPlan.getNombre();
+        String prevPlanName = planService.getNombrePlan(idPlan);
 
-        prevPlan.setNombre(planCreateDTO.getNombre());
-        prevPlan.setDescripcion(planCreateDTO.getDescripcion());
-        prevPlan.setCategoria(planCreateDTO.getCategoria());
-        prevPlan.setRangoMinDinero(planCreateDTO.getRangoMinDinero());
-        prevPlan.setRangoMaxDinero(planCreateDTO.getRangoMaxDinero());
-
-        prevPlan.getUbicacion().setLatitud(planCreateDTO.getLatitud());
-        prevPlan.getUbicacion().setLongitud(planCreateDTO.getLongitud());
-        prevPlan.getUbicacion().setDireccion(planCreateDTO.getDireccion());
-
-        // falta añadir que compare las caracteristicas nuevas con las que estaban antes
-        // para no estar consumiendo ids de la bd innecesariamente
-        prevPlan.getCaracteristicasPlan().clear();
-        planCreateDTO.getCaracteristicas()
-                .forEach(c -> {
-                    prevPlan.getCaracteristicasPlan().add(new CaracteristicaPlan(
-                            prevPlan,
-                            new Caracteristica(c)
-                    ));
-                });
-
-        // lo mismo de las caracteristicas añadirlo aca
-        prevPlan.getImagenes().clear();
+        List<Caracteristica> caracteristicas = planCreateDTO.getCaracteristicas().stream()
+                .map(c -> new Caracteristica(c))
+                .collect(Collectors.toList());
 
         List<String> urls = storageService.updatePlanImages(idPlan, prevPlanName, plan.getNombre(), planCreateDTO.getImagenesFiles());
-        urls.forEach(url -> {
-            prevPlan.getImagenes().add(new ImagenPlan(url));
-        });
 
-        prevPlan.setImagenMiniatura(urls.get(planCreateDTO.getMiniaturaSelect()));
+        plan.setImagenMiniatura(urls.get(planCreateDTO.getMiniaturaSelect()));
 
-        planService.updatePlan(idPlan, prevPlan);
+        planService.updatePlan(idPlan, plan, caracteristicas, urls);
 
         return new ResponseEntity<>(
                 SuccessResponse
@@ -137,7 +119,12 @@ public class PlanController {
     @DeleteMapping("/delete/{idPlan}")
     public ResponseEntity<?> deletePlan (@PathVariable("idPlan") Long idPlan) {
 
-        String planName = planService.getPlan(idPlan).getNombre();
+        if (!planService.isPlanExists(idPlan)) {
+            throw new ResourceNotFoundException(String
+                    .format("Plan not found for id=%s", idPlan));
+        }
+
+        String planName = planService.getNombrePlan(idPlan);
         planService.deletePlan(idPlan);
         storageService.deleteFolderPlan(idPlan, planName);
 
