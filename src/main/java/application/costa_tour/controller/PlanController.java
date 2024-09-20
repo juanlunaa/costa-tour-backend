@@ -2,6 +2,7 @@ package application.costa_tour.controller;
 
 import application.costa_tour.dto.PlanCreateDTO;
 import application.costa_tour.dto.mapper.PlanCreateMapper;
+import application.costa_tour.exception.BadRequestException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.exception.SuccessResponse;
 import application.costa_tour.model.*;
@@ -11,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,35 +45,30 @@ public class PlanController {
         return ResponseEntity.ok(planService.getPlan(id));
     }
 
-
     // falta añadir el tema de los hechos para los planes de categoria SITIOS_TURISTICOS
     @PostMapping("/create")
     public ResponseEntity<?> createPlan (@ModelAttribute @Valid PlanCreateDTO planCreateDTO) {
 
+        createAndUpdateValidations(
+                planCreateDTO.getCaracteristicas(),
+                planCreateDTO.getMiniaturaSelect(),
+                planCreateDTO.getImagenesFiles().size());
+
         Plan plan = PlanCreateMapper.mapper.planCreateDtoToPlan(planCreateDTO);
 
-        List<CaracteristicaPlan> caracteristicasPlan = planCreateDTO.getCaracteristicas()
-                .stream()
-                .map(c -> new CaracteristicaPlan(
-                            plan,
-                            new Caracteristica(c)))
-                .collect(Collectors.toList());
+        plan.addCaracteristicas(planCreateDTO.getCaracteristicas().stream()
+                .map(ic -> new Caracteristica(ic))
+                .collect(Collectors.toList())
+        );
 
-        plan.setCaracteristicasPlan(caracteristicasPlan);
+        plan = planService.createPlan(plan);
 
-        ubicacionService.createUbicacion(plan.getUbicacion());
+        List<String> urls = storageService.savePlanImages(plan.getId(), planCreateDTO.getNombre(), planCreateDTO.getImagenesFiles());
 
-        Plan newPlan = planService.createPlan(plan);
+        plan.addImagenes(urls);
+        plan.setImagenMiniatura(urls.get(planCreateDTO.getMiniaturaSelect()));
 
-        List<String> urls = storageService.savePlanImages(newPlan.getId(), planCreateDTO.getNombre(), planCreateDTO.getImagenesFiles());
-        List<ImagenPlan> imagenPlanList = urls.stream()
-                .map(url -> new ImagenPlan(url))
-                .collect(Collectors.toList());
-
-        newPlan.setImagenes(imagenPlanList);
-        newPlan.setImagenMiniatura(urls.get(planCreateDTO.getMiniaturaSelect()));
-
-        planService.createPlan(newPlan);
+        planService.createPlan(plan);
 
         return new ResponseEntity<>(
                 SuccessResponse
@@ -94,6 +88,11 @@ public class PlanController {
             throw new ResourceNotFoundException(String
                     .format("Plan not found for id=%s", idPlan));
         }
+
+        createAndUpdateValidations(
+                planCreateDTO.getCaracteristicas(),
+                planCreateDTO.getMiniaturaSelect(),
+                planCreateDTO.getImagenesFiles().size());
 
         Plan plan = PlanCreateMapper.mapper.planCreateDtoToPlan(planCreateDTO);
         String prevPlanName = planService.getNombrePlan(idPlan);
@@ -134,5 +133,23 @@ public class PlanController {
                         .message("Plan deleted successfully")
                         .build(),
                 HttpStatus.OK);
+    }
+
+    private void createAndUpdateValidations(List<Long> idCaracteristicasList, int miniaturaSelect, int imagesFilesSize) {
+//      se valida que las caracteristicas que se estan relacionando al plan si existan en la base de datos
+        caracteristicaService.isExistsCaracteristicas(idCaracteristicasList);
+
+//      se valida que la miniatura seleccionada del plan no pueda ser mayor al numero de imagenes que vienen relacionadas al plan
+//      o sea que si vienen 4 imagenes no pueda seleccionar como miniatura la imagen 5, porque no exite
+        if (miniaturaSelect > (imagesFilesSize - 1)) {
+            throw new BadRequestException(String
+                    .format("MiniaturaSelect cannot be larger than the size of ImagenesFiles"));
+        }
+
+//      se valida que la miniatura seleccionada del plan no pueda se menor que 0
+        if (miniaturaSelect < 0) {
+            throw new BadRequestException(String
+                    .format("MiniaturaSelect cannot be less than 0"));
+        }
     }
 }
