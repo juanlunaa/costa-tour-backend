@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -54,6 +55,23 @@ public class Plan {
 
     @OneToMany(mappedBy = "plan", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CaracteristicaPlan> caracteristicasPlan;
+
+    public void addCaracteristicas(List<Caracteristica> caracteristicas) {
+        this.caracteristicasPlan = new ArrayList<>();
+
+        for (Caracteristica caracteristica : caracteristicas) {
+            CaracteristicaPlan newRelacionCp = new CaracteristicaPlan(this, caracteristica);
+            caracteristicasPlan.add(newRelacionCp);
+        }
+    }
+
+    public void addImagenes(List<String> urls) {
+        this.imagenes = new ArrayList<>();
+
+        for (String url : urls) {
+            imagenes.add(new ImagenPlan(url));
+        }
+    }
 
     public void updateCaracteristicas(List<Caracteristica> newCaracteristicas) {
 //      transformo las nuevas caracteristicas (List -> Map) a un map
