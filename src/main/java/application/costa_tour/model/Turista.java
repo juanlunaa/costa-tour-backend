@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -36,4 +37,7 @@ public class Turista {
     @OneToOne
     @JoinColumn(name="id_usuario")
     private Usuario usuario;
+
+    @OneToMany(mappedBy = "turista", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<InteresTurista> interesesTuristas;
 }
