@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class EstadoDTO {
+public class InteresTuristaDTO {
     private Long id;
-    private String name;
+    private String interes;
 }

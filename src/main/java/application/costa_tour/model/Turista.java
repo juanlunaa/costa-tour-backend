@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,5 +40,14 @@ public class Turista {
     private Usuario usuario;
 
     @OneToMany(mappedBy = "turista", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<InteresTurista> interesesTuristas;
+    private List<InteresTurista> interesesTurista;
+
+    public void addIntereses(List<Interes> intereses) {
+        this.interesesTurista = new ArrayList<>();
+
+        for (Interes interes : intereses) {
+            InteresTurista newRelacionIt = new InteresTurista(this, interes);
+            interesesTurista.add(newRelacionIt);
+        }
+    }
 }

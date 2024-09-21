@@ -7,6 +7,7 @@ import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class TuristaCreateDTO {
@@ -26,4 +27,6 @@ public class TuristaCreateDTO {
     private String password;
     @NotNull
     private Long idCiudad;
+    @NotEmpty
+    private List<Long> intereses;
 }
