@@ -1,11 +1,14 @@
 package application.costa_tour.controller;
 
 import application.costa_tour.dto.PlanCreateDTO;
+import application.costa_tour.dto.PlanDTO;
+import application.costa_tour.dto.TuristaDTO;
 import application.costa_tour.dto.mapper.PlanCreateMapper;
 import application.costa_tour.exception.BadRequestException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.exception.SuccessResponse;
 import application.costa_tour.model.*;
+import application.costa_tour.model.enums.PlanCategory;
 import application.costa_tour.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +25,9 @@ public class PlanController {
 
     @Autowired
     private PlanService planService;
+
+    @Autowired
+    private TuristaService turistaService;
 
     @Autowired
     private CaracteristicaPlanService caracteristicaPlanService;
@@ -133,6 +139,24 @@ public class PlanController {
                         .message("Plan deleted successfully")
                         .build(),
                 HttpStatus.OK);
+    }
+
+    @GetMapping("/recomendation")
+    public ResponseEntity<?> getPlanRecomendation(
+            @RequestParam PlanCategory categoria,
+            @RequestParam String dniTurista
+    ) {
+
+        TuristaDTO turista = turistaService.getTuristaByDni(dniTurista);
+        List<PlanDTO> planes = planService.getPlansByCategoria(categoria);
+
+        List<PlanDTO> planesRecomendados = planService.planRecomendation(
+                planes,
+                turista.getIntereses(),
+                3
+        );
+
+        return ResponseEntity.ok(planesRecomendados);
     }
 
     private void createAndUpdateValidations(List<Long> idCaracteristicasList, int miniaturaSelect, int imagesFilesSize) {

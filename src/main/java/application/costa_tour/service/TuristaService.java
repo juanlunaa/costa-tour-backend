@@ -3,6 +3,7 @@ package application.costa_tour.service;
 import application.costa_tour.dto.TuristaDTO;
 import application.costa_tour.dto.mapper.TuristaMapper;
 import application.costa_tour.exception.ResourceNotFoundException;
+import application.costa_tour.model.InteresTurista;
 import application.costa_tour.model.Turista;
 import application.costa_tour.model.Usuario;
 import application.costa_tour.repository.TuristaRepository;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
+import java.util.List;
 
 @Service
 public class TuristaService {
@@ -23,13 +25,17 @@ public class TuristaService {
         Turista turista = turistaRepository.findTuristaByUsuarioId(user.getId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(String
-                            .format("Client not found for user id=%s", user.getId())));
+                            .format("Tourist not found for user id=%s", user.getId())));
 
         return TuristaMapper.mapper.turistaToTuristaDto(turista);
     }
 
     public TuristaDTO getTuristaByDni (String dni) {
-        Turista turista = turistaRepository.findById(dni).orElse(null);
+        Turista turista = turistaRepository.findById(dni)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(String
+                                .format("Tourist not found for dni=%s", dni)));
+
         return TuristaMapper.mapper.turistaToTuristaDto(turista);
     }
 

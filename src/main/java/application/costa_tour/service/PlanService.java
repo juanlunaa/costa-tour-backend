@@ -1,17 +1,22 @@
 package application.costa_tour.service;
 
+import application.costa_tour.dto.CaracteristicaPlanDTO;
+import application.costa_tour.dto.InteresTuristaDTO;
 import application.costa_tour.dto.PlanDTO;
 import application.costa_tour.dto.mapper.PlanMapper;
+import application.costa_tour.exception.BadRequestException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.model.Caracteristica;
 import application.costa_tour.model.CaracteristicaPlan;
 import application.costa_tour.model.ImagenPlan;
 import application.costa_tour.model.Plan;
+import application.costa_tour.model.enums.PlanCategory;
 import application.costa_tour.repository.PlanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class PlanService {
@@ -28,6 +33,10 @@ public class PlanService {
 
     public List<PlanDTO> getAllPlans () {
         return PlanMapper.mapper.plansToPlanDtos(planRepository.findAll());
+    }
+
+    public List<PlanDTO> getPlansByCategoria(PlanCategory categoria) {
+        return PlanMapper.mapper.plansToPlanDtos(planRepository.findPlansByCategoria(categoria));
     }
 
     public Plan createPlan (Plan plan) {
@@ -64,5 +73,46 @@ public class PlanService {
 
     public boolean isPlanExists(Long id) {
         return planRepository.findById(id).orElse(null) != null;
+    }
+
+    public List<PlanDTO> planRecomendation(List<PlanDTO> planes, List<InteresTuristaDTO> interesesTurista, int numPlanes) {
+
+        if (numPlanes > planes.size()) {
+            throw new BadRequestException("The number of plans to recommend is greater than the total number of plans");
+        }
+
+        PriorityQueue<PlanDTO> neighbors = new PriorityQueue<>(
+                Comparator.comparingDouble(p -> calculateDistanceBetweenPlanAndTurista(p.getCaracteristicas(), interesesTurista))
+        );
+
+        for (PlanDTO plan : planes) {
+            neighbors.offer(plan);
+        }
+
+        List<PlanDTO> planesCercanosAlTurista = new ArrayList<>();
+
+        for (int i = 0; i < numPlanes; i++) {
+            planesCercanosAlTurista.add(neighbors.poll());
+        }
+
+        return planesCercanosAlTurista;
+    }
+
+    public double calculateDistanceBetweenPlanAndTurista(
+            List<CaracteristicaPlanDTO> caracteristicasPlan,
+            List<InteresTuristaDTO> interesTurista
+    ) {
+        Set<String> setIntereses = interesTurista.stream()
+                .map(i -> i.getInteres())
+                .collect(Collectors.toSet());
+
+        Set<String> setCaracteristicas = caracteristicasPlan.stream()
+                .map(c -> c.getCaracteristica())
+                .collect(Collectors.toSet());
+
+        setIntereses.retainAll(setCaracteristicas);
+        int commonElements = setIntereses.size();
+
+        return 1.0 / (1.0 + commonElements);
     }
 }

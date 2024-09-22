@@ -19,4 +19,5 @@ public class PlanDTO {
     private List<HechoPlanDTO> hechos;
     private List<CaracteristicaPlanDTO> caracteristicas;
     private UbicacionDTO ubicacion;
+    private float calificacionPromedio;
 }
