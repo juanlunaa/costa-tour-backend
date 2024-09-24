@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/turist")
+@CrossOrigin(origins = "http://localhost:3000")
 public class TuristaController {
 
     @Autowired
@@ -44,7 +45,7 @@ public class TuristaController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createTurist (@ModelAttribute @Valid TuristaCreateDTO turistaDTO) {
+    public ResponseEntity<?> createTurist (@RequestBody @Valid TuristaCreateDTO turistaDTO) {
 
         if (turistaService.isExistingTurista(turistaDTO.getDni())) {
             throw new ClientAlredyExistException("Turist already exist.");
