@@ -1,5 +1,9 @@
 package application.costa_tour.controller;
 
+import application.costa_tour.dto.AdministradorDTO;
+import application.costa_tour.dto.AliadoDTO;
+import application.costa_tour.dto.response.AuthResDTO;
+import application.costa_tour.dto.TuristaDTO;
 import application.costa_tour.dto.request.AuthReqDTO;
 import application.costa_tour.dto.request.UpdateAvatarReqDTO;
 import application.costa_tour.exception.*;
@@ -8,6 +12,7 @@ import application.costa_tour.model.Usuario;
 import application.costa_tour.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +29,7 @@ public class UserController {
     private StorageService storageService;
 
     @Autowired
-    private TuristaService clienteService;
+    private TuristaService turistaService;
 
     @Autowired
     private AdministradorService administradorService;
@@ -33,29 +38,38 @@ public class UserController {
     private AliadoService aliadoService;
 
     @PostMapping("/auth")
-    public ResponseEntity<?> loginUser (
+    public ResponseEntity<AuthResDTO<?>> loginUser (
             @ModelAttribute @Valid AuthReqDTO authReq
             ) {
 
-        Usuario user = usuarioService.credentialsValidate(authReq.getEmail(), authReq.getPassword());
+        Pair<String, Usuario> tokenAndUser = usuarioService.credentialsValidate(authReq.getEmail(), authReq.getPassword());
 
-        if (user.getTipo().equals(UserRole.TURISTA)) {
+        if (tokenAndUser.getSecond().getTipo().equals(UserRole.TURISTA)) {
             return new ResponseEntity<>(
-                clienteService.getTuristaByUser(user),
+                AuthResDTO.<TuristaDTO>builder()
+                        .user(turistaService.getTuristaByUser(tokenAndUser.getSecond()))
+                        .token(tokenAndUser.getFirst())
+                        .build(),
                 HttpStatus.OK
             );
         }
 
-        if (user.getTipo().equals(UserRole.ADMINISTRADOR)) {
+        if (tokenAndUser.getSecond().getTipo().equals(UserRole.ADMINISTRADOR)) {
             return new ResponseEntity<>(
-                administradorService.getAdminByUser(user),
+                AuthResDTO.<AdministradorDTO>builder()
+                        .user(administradorService.getAdminByUser(tokenAndUser.getSecond()))
+                        .token(tokenAndUser.getFirst())
+                        .build(),
                 HttpStatus.OK
             );
         }
 
-        if (user.getTipo().equals(UserRole.ALIADO)) {
+        if (tokenAndUser.getSecond().getTipo().equals(UserRole.ALIADO)) {
             return new ResponseEntity<>(
-                    aliadoService.getAliadoByUser(user),
+                    AuthResDTO.<AliadoDTO>builder()
+                            .user(aliadoService.getAliadoByUser(tokenAndUser.getSecond()))
+                            .token(tokenAndUser.getFirst())
+                            .build(),
                     HttpStatus.OK
             );
         }

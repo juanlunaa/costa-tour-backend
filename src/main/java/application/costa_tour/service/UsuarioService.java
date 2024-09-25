@@ -2,9 +2,13 @@ package application.costa_tour.service;
 
 import application.costa_tour.exception.InvalidCredentialsException;
 import application.costa_tour.exception.ResourceNotFoundException;
+import application.costa_tour.jwt.JwtService;
 import application.costa_tour.model.Usuario;
 import application.costa_tour.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,15 +17,28 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    public Usuario credentialsValidate (String email, String password) {
-        Usuario user = usuarioRepository.findByEmail(email)
+    @Autowired
+    private JwtService jwtService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    public Pair<String, Usuario> credentialsValidate (String email, String password) {
+//        Usuario user = usuarioRepository.findByEmail(email)
+//                .orElseThrow(() -> new ResourceNotFoundException("Email not exists"));
+//
+//        if (!user.getPassword().equals(password)) {
+//            throw new InvalidCredentialsException("Password is invalid");
+//        }
+//
+//        return user;
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(email, password));
+
+        Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Email not exists"));
 
-        if (!user.getPassword().equals(password)) {
-            throw new InvalidCredentialsException("Password is invalid");
-        }
-
-        return user;
+        return Pair.of(jwtService.getToken(usuario), usuario);
     }
 
     public void createUser (Usuario usuario) {
