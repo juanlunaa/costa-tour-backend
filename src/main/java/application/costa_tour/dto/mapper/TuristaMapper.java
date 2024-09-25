@@ -20,6 +20,7 @@ public interface TuristaMapper {
 
         TuristaDTO turistaDTO = new TuristaDTO();
 
+        turistaDTO.setUserId(turista.getUsuario().getId());
         turistaDTO.setDni(turista.getDni());
         turistaDTO.setTipoUsuario(turista.getUsuario().getTipo().toString());
         turistaDTO.setNombre(turista.getNombre());
