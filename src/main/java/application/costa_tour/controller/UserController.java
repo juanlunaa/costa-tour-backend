@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
 
     @Autowired
@@ -41,7 +42,7 @@ public class UserController {
 
     @PostMapping("/auth")
     public ResponseEntity<?> loginUser (
-            @ModelAttribute @Valid AuthReqDTO authReq,
+            @RequestBody @Valid AuthReqDTO authReq,
             HttpServletResponse res
             ) {
 
@@ -109,7 +110,7 @@ public class UserController {
     private Cookie createJwtCookie(String token) {
         Cookie jwtCookie = new Cookie("token", token);
         jwtCookie.setHttpOnly(true); // La cookie no es accesible mediante JavaScript
-        jwtCookie.setSecure(true);   // Solo se envía a través de HTTPS
+        jwtCookie.setSecure(false);   // Solo se envía a través de HTTPS
         jwtCookie.setPath("/");      // Hacerla disponible para toda la aplicación
         jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Expira en 7 días
 
