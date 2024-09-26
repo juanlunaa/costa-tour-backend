@@ -2,6 +2,7 @@ package application.costa_tour.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,16 +69,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private String getTokenFromReq(HttpServletRequest req) {
 //      Se extrae los datos de autorizacion que vienen en el header de la request
 //      donde se espera que este el token
-        final String authHeader = req.getHeader(HttpHeaders.AUTHORIZATION);
+//        final String authHeader = req.getHeader(HttpHeaders.AUTHORIZATION);
 
 //      Segun el estandar de autenticacion el token se envie en el encabezado
 //      HTTP Authorization debe ir con el prefijo Bearer
-        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
+//        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
 //          Retornamos el authHeader desde el index 7 para que solamente vaya el token
 //          sin el prefijo "Bearer "
-            return authHeader.substring(7);
-        }
+//            return authHeader.substring(7);
+//        }
 //      Si no hay token en el header
-        return null;
+//        return null;
+        String jwtToken = null;
+//      Como el token va a estar almacenado en las cookies, debemos sacarlo de ahi
+        Cookie[] cookies = req.getCookies();
+
+        if (cookies == null) return null;
+
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("token")) {
+                jwtToken = cookie.getValue();
+            }
+        }
+
+        return jwtToken;
     }
 }

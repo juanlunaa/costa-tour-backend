@@ -10,6 +10,8 @@ import application.costa_tour.exception.*;
 import application.costa_tour.model.enums.UserRole;
 import application.costa_tour.model.Usuario;
 import application.costa_tour.service.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -38,38 +40,34 @@ public class UserController {
     private AliadoService aliadoService;
 
     @PostMapping("/auth")
-    public ResponseEntity<AuthResDTO<?>> loginUser (
-            @ModelAttribute @Valid AuthReqDTO authReq
+    public ResponseEntity<?> loginUser (
+            @ModelAttribute @Valid AuthReqDTO authReq,
+            HttpServletResponse res
             ) {
 
         Pair<String, Usuario> tokenAndUser = usuarioService.credentialsValidate(authReq.getEmail(), authReq.getPassword());
 
+        if (tokenAndUser != null) {
+            res.addCookie(createJwtCookie(tokenAndUser.getFirst()));
+        }
+
         if (tokenAndUser.getSecond().getTipo().equals(UserRole.TURISTA)) {
             return new ResponseEntity<>(
-                AuthResDTO.<TuristaDTO>builder()
-                        .user(turistaService.getTuristaByUser(tokenAndUser.getSecond()))
-                        .token(tokenAndUser.getFirst())
-                        .build(),
-                HttpStatus.OK
+                    turistaService.getTuristaByUser(tokenAndUser.getSecond()),
+                    HttpStatus.OK
             );
         }
 
         if (tokenAndUser.getSecond().getTipo().equals(UserRole.ADMINISTRADOR)) {
             return new ResponseEntity<>(
-                AuthResDTO.<AdministradorDTO>builder()
-                        .user(administradorService.getAdminByUser(tokenAndUser.getSecond()))
-                        .token(tokenAndUser.getFirst())
-                        .build(),
-                HttpStatus.OK
+                    administradorService.getAdminByUser(tokenAndUser.getSecond()),
+                    HttpStatus.OK
             );
         }
 
         if (tokenAndUser.getSecond().getTipo().equals(UserRole.ALIADO)) {
             return new ResponseEntity<>(
-                    AuthResDTO.<AliadoDTO>builder()
-                            .user(aliadoService.getAliadoByUser(tokenAndUser.getSecond()))
-                            .token(tokenAndUser.getFirst())
-                            .build(),
+                    aliadoService.getAliadoByUser(tokenAndUser.getSecond()),
                     HttpStatus.OK
             );
         }
@@ -106,5 +104,15 @@ public class UserController {
                         .build(),
                 HttpStatus.OK
         );
+    }
+
+    private Cookie createJwtCookie(String token) {
+        Cookie jwtCookie = new Cookie("token", token);
+        jwtCookie.setHttpOnly(true); // La cookie no es accesible mediante JavaScript
+        jwtCookie.setSecure(true);   // Solo se envía a través de HTTPS
+        jwtCookie.setPath("/");      // Hacerla disponible para toda la aplicación
+        jwtCookie.setMaxAge(7 * 24 * 60 * 60); // Expira en 7 días
+
+        return jwtCookie;
     }
 }

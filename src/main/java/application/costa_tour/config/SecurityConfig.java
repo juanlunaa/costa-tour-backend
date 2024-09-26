@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/user/auth",
                                 "/plan/all",
-                                "/plan/{id}",
+//                                "/plan/{id}",
                                 "/files/**",
                                 "/location/**"
                         ).permitAll()
