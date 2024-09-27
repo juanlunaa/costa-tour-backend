@@ -1,20 +1,24 @@
 package application.costa_tour.jwt;
 
+import application.costa_tour.exception.UnauthorizedException;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.UnavailableException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
 
@@ -28,19 +32,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
+    @Qualifier("handlerExceptionResolver")
+    private HandlerExceptionResolver resolver;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+//      Se obtiene el endpoint al que se esta haciendo la solicitud
+        String path = request.getRequestURI();
 
-        final String token = getTokenFromReq(request);
-        String email;
-
-//      Si no hay token se continua la cadena de filtros directamente
-        if (token == null) {
+//      Si la solicitud es realizada a un endpoint publico seguimos la cadena de filtros
+//      para que no aplique la validacion del JWT a estas rutas
+        if (
+                "/user/auth".equals(path)
+                || "/plan/all".equals(path)
+                || path.startsWith("/files/")
+                || path.startsWith("/location/")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        email = jwtService.getEmailFromToken(token);
+        final String token = jwtService.getTokenFromReq(request);
+        String email;
+
+//      Si no hay token se continua la cadena de filtros directamente
+        try {
+            if (token == null) {
+                throw new UnauthorizedException("Token is null");
+            }
+
+            email = jwtService.getEmailFromToken(token);
+        } catch (UnauthorizedException e) {
+            resolver.resolveException(request, response, null, e);
+            return;
+        }
 
 //      Si hay un email en el payload del token y el contexto del SecurityContextHolder esta vacio
 //      entonces el usuario se va a buscar en la bd
@@ -59,39 +85,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            } else {
+                try {
+                    throw new UnavailableException("Token is invalid");
+                } catch (UnauthorizedException e) {
+                    resolver.resolveException(request, response, null, e);
+                }
             }
         }
-
+        System.out.println("holas");
         filterChain.doFilter(request, response);
-    }
-
-//  Metodo para extraer el token de la request
-    private String getTokenFromReq(HttpServletRequest req) {
-//      Se extrae los datos de autorizacion que vienen en el header de la request
-//      donde se espera que este el token
-//        final String authHeader = req.getHeader(HttpHeaders.AUTHORIZATION);
-
-//      Segun el estandar de autenticacion el token se envie en el encabezado
-//      HTTP Authorization debe ir con el prefijo Bearer
-//        if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer ")) {
-//          Retornamos el authHeader desde el index 7 para que solamente vaya el token
-//          sin el prefijo "Bearer "
-//            return authHeader.substring(7);
-//        }
-//      Si no hay token en el header
-//        return null;
-        String jwtToken = null;
-//      Como el token va a estar almacenado en las cookies, debemos sacarlo de ahi
-        Cookie[] cookies = req.getCookies();
-
-        if (cookies == null) return null;
-
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("token")) {
-                jwtToken = cookie.getValue();
-            }
-        }
-
-        return jwtToken;
     }
 }
