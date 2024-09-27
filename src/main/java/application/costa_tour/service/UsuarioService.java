@@ -23,6 +23,11 @@ public class UsuarioService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    public Usuario getUserByEmail(String email) {
+        return usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Email not exists"));
+    }
+
     public Pair<String, Usuario> credentialsValidate (String email, String password) {
 //        Usuario user = usuarioRepository.findByEmail(email)
 //                .orElseThrow(() -> new ResourceNotFoundException("Email not exists"));
