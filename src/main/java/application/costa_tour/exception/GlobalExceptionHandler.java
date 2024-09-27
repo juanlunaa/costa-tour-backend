@@ -14,6 +14,18 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<?> handlerUnauthorizedException(
+            UnauthorizedException ex,
+            WebRequest webRequest
+    ) {
+        return new ResponseEntity<>(
+                new ErrorResponse(
+                        ex.getMessage(),
+                        webRequest.getDescription(false)),
+                HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(AdminAlreadyExistException.class)
     public ResponseEntity<?> handlerAdminAlreadyExistException (
             AdminAlreadyExistException ex,
