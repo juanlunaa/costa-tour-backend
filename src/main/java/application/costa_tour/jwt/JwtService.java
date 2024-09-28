@@ -32,16 +32,18 @@ public class JwtService {
     private static final long EXPIRATION_TIME_MS = 1000 * 60 * 60;
 
     public String getToken(UserDetails user) {
-        return getToken(new HashMap<>(), user);
+        return getToken(Map.of("role", user.getAuthorities()), user);
     }
 
     private String getToken(Map<String,Object> extraClaims, UserDetails user) {
+
+        System.out.println(SECRET_KEY);
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME_MS))
-                .signWith(getKey(), SignatureAlgorithm.HS256)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY.getBytes())
                 .compact();
     }
 
@@ -95,7 +97,7 @@ public class JwtService {
     private Claims getAllClaims (String token) {
         try {
             return Jwts.parser()
-                    .setSigningKey(getKey())
+                    .setSigningKey(SECRET_KEY.getBytes())
                     .build()
                     .parseClaimsJws(token)
                     .getBody();
