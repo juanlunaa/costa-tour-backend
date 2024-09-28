@@ -163,7 +163,6 @@ public class UserController {
         jwtCookie.setSecure(false);   // Solo se envía a través de HTTPS
         jwtCookie.setPath("/");      // Hacerla disponible para toda la aplicación
         jwtCookie.setMaxAge(expirationTime); // Expira en 7 días
-        System.out.println(jwtCookie);
         return jwtCookie;
     }
 

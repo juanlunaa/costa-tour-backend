@@ -93,7 +93,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         }
-        System.out.println("holas");
         filterChain.doFilter(request, response);
     }
 }
