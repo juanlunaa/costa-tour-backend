@@ -41,32 +41,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //      Se obtiene el endpoint al que se esta haciendo la solicitud
         String path = request.getRequestURI();
 
-//      Si la solicitud es realizada a un endpoint publico seguimos la cadena de filtros
-//      para que no aplique la validacion del JWT a estas rutas
-        if (
-                "/user/auth".equals(path)
-                || "/plan/all".equals(path)
-                || path.startsWith("/files/")
-                || path.startsWith("/location/")
-        ) {
+        final String token = jwtService.getTokenFromReq(request);
+        String email;
+//      Si no hay token se continua la cadena de filtros directamente
+        if (token == null) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        final String token = jwtService.getTokenFromReq(request);
-        String email;
-
-//      Si no hay token se continua la cadena de filtros directamente
-        try {
-            if (token == null) {
-                throw new UnauthorizedException("Token is null");
-            }
-
-            email = jwtService.getEmailFromToken(token);
-        } catch (UnauthorizedException e) {
-            resolver.resolveException(request, response, null, e);
-            return;
-        }
+        email = jwtService.getEmailFromToken(token);
 
 //      Si hay un email en el payload del token y el contexto del SecurityContextHolder esta vacio
 //      entonces el usuario se va a buscar en la bd

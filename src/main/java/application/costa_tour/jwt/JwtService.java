@@ -36,8 +36,6 @@ public class JwtService {
     }
 
     private String getToken(Map<String,Object> extraClaims, UserDetails user) {
-
-        System.out.println(SECRET_KEY);
         return Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(user.getUsername())
