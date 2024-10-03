@@ -1,14 +1,18 @@
 package application.costa_tour.service;
 
+import application.costa_tour.exception.BadRequestException;
 import application.costa_tour.exception.InvalidCredentialsException;
 import application.costa_tour.exception.ResourceNotFoundException;
+import application.costa_tour.exception.UnauthorizedException;
 import application.costa_tour.jwt.JwtService;
 import application.costa_tour.model.Usuario;
 import application.costa_tour.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -29,16 +33,19 @@ public class UsuarioService {
     }
 
     public Pair<String, Usuario> credentialsValidate (String email, String password) {
-//        Usuario user = usuarioRepository.findByEmail(email)
-//                .orElseThrow(() -> new ResourceNotFoundException("Email not exists"));
-//
-//        if (!user.getPassword().equals(password)) {
-//            throw new InvalidCredentialsException("Password is invalid");
-//        }
-//
-//        return user;
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(email, password));
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, password)
+            );
+        } catch (AuthenticationException ex) {
+            if (ex.getMessage().equals("Bad credentials")) {
+                throw new UnauthorizedException("Password is invalid");
+            }  else if (ex.getMessage().equals("Email not exists")) {
+                throw new ResourceNotFoundException("Email not exists");
+            }
+
+            throw new BadRequestException("Brutal error in auth module 💀💀");
+        }
 
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Email not exists"));
