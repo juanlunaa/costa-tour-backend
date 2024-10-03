@@ -1,6 +1,7 @@
 package application.costa_tour.config;
 
 import application.costa_tour.jwt.JwtAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,15 +14,14 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
 //  Se inyecta el filtro personalizado de JWT para añadirlo a la cadena de filtros
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthFilter;
+    private final JwtAuthenticationFilter jwtAuthFilter;
 
 //  Se inyecta el AuthenticationProvider configurado en ApplicationConfig
-    @Autowired
-    private AuthenticationProvider authProvider;
+    private final AuthenticationProvider authProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -30,14 +30,16 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                     req
                         .requestMatchers(
-                                "/user/auth",
+                                "/user/**",
                                 "/plan/all",
-//                                "/plan/{id}",
+                                "/plan/{id}",
+                                "/interest/**",
                                 "/files/**",
-                                "/location/**"
+                                "/location/**",
+                                "/turist/create",
+                                "/turist/validate-dni"
                         ).permitAll()
                         .requestMatchers("/plan/**").authenticated()
-                        .requestMatchers("/user/**").authenticated()
                         .anyRequest().authenticated()
                     )
 //              No se crearan ni se usaran sesiones HTTP para almacenar información sobre el usuario autenticado
