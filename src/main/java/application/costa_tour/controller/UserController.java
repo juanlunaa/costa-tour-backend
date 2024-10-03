@@ -1,9 +1,5 @@
 package application.costa_tour.controller;
 
-import application.costa_tour.dto.AdministradorDTO;
-import application.costa_tour.dto.AliadoDTO;
-import application.costa_tour.dto.response.AuthResDTO;
-import application.costa_tour.dto.TuristaDTO;
 import application.costa_tour.dto.request.AuthReqDTO;
 import application.costa_tour.dto.request.UpdateAvatarReqDTO;
 import application.costa_tour.exception.*;
@@ -19,13 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 public class UserController {
 
     @Autowired
@@ -55,7 +49,7 @@ public class UserController {
         Pair<String, Usuario> tokenAndUser = usuarioService.credentialsValidate(authReq.getEmail(), authReq.getPassword());
 
         if (tokenAndUser != null) {
-            res.addCookie(createJwtCookie(tokenAndUser.getFirst(), 1000 * 60 * 60));
+            res.addCookie(createJwtCookie(tokenAndUser.getFirst(), 3600));
 
             Object fullUser = getUsertypeByUser(tokenAndUser.getSecond());
 
@@ -66,28 +60,7 @@ public class UserController {
                     HttpStatus.OK
             );
         }
-
-//        if (tokenAndUser.getSecond().getTipo().equals(UserRole.TURISTA)) {
-//            return new ResponseEntity<>(
-//                    turistaService.getTuristaByUser(tokenAndUser.getSecond()),
-//                    HttpStatus.OK
-//            );
-//        }
-//
-//        if (tokenAndUser.getSecond().getTipo().equals(UserRole.ADMINISTRADOR)) {
-//            return new ResponseEntity<>(
-//                    administradorService.getAdminByUser(tokenAndUser.getSecond()),
-//                    HttpStatus.OK
-//            );
-//        }
-//
-//        if (tokenAndUser.getSecond().getTipo().equals(UserRole.ALIADO)) {
-//            return new ResponseEntity<>(
-//                    aliadoService.getAliadoByUser(tokenAndUser.getSecond()),
-//                    HttpStatus.OK
-//            );
-//        }
-
+        
         throw new BadRequestException("Error in auth module");
     }
 
@@ -121,7 +94,9 @@ public class UserController {
         res.addCookie(createJwtCookie(null, 0));
 
         return new ResponseEntity<>(
-                SuccessResponse.builder().message("Logout succesfully").build(),
+                SuccessResponse.builder()
+                        .message("Logout succesfully")
+                        .build(),
                 HttpStatus.OK
         );
     }
@@ -157,9 +132,23 @@ public class UserController {
         );
     }
 
+    @GetMapping("/validate-email")
+    public ResponseEntity<?> validateEmail(@RequestParam("email") String email) {
+        if (usuarioService.isExitsAccountWithEmail(email)) {
+            throw new UserAlreadyExistException("An account associated with an email already exists");
+        }
+
+        return new ResponseEntity<>(
+                SuccessResponse.builder()
+                        .message("Email is available")
+                        .build(),
+                HttpStatus.OK
+                );
+    }
+
     private Cookie createJwtCookie(String token, int expirationTime) {
         Cookie jwtCookie = new Cookie("token", token);
-        jwtCookie.setHttpOnly(true); // La cookie no es accesible mediante JavaScript
+        jwtCookie.setHttpOnly(false); // La cookie no es accesible mediante JavaScript
         jwtCookie.setSecure(false);   // Solo se envía a través de HTTPS
         jwtCookie.setPath("/");      // Hacerla disponible para toda la aplicación
         jwtCookie.setMaxAge(expirationTime); // Expira en 7 días
