@@ -4,9 +4,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @ResponseStatus(value = HttpStatus.CONFLICT)
-public class AdminAlreadyExistException extends RuntimeException {
+public class UserAlreadyExistException extends RuntimeException {
 
-    public AdminAlreadyExistException(String message) {
+    public UserAlreadyExistException(String message) {
         super(message);
     }
 

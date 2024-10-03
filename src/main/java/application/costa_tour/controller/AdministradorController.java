@@ -2,8 +2,7 @@ package application.costa_tour.controller;
 
 import application.costa_tour.dto.AdministradorCreateDTO;
 import application.costa_tour.dto.mapper.AdministradorCreateMapper;
-import application.costa_tour.exception.AdminAlreadyExistException;
-import application.costa_tour.exception.ResourceNotFoundException;
+import application.costa_tour.exception.UserAlreadyExistException;
 import application.costa_tour.exception.SuccessResponse;
 import application.costa_tour.model.Administrador;
 import application.costa_tour.model.enums.UserRole;
@@ -32,7 +31,7 @@ public class AdministradorController {
     public ResponseEntity<?> createBasicAdmin (@ModelAttribute @Valid AdministradorCreateDTO adminDto) {
 
         if (usuarioService.isExitsAccountWithEmail(adminDto.getEmail())) {
-            throw new AdminAlreadyExistException("An account associated with an email already exists");
+            throw new UserAlreadyExistException("An account associated with an email already exists");
         }
 
         Administrador admin = AdministradorCreateMapper.mapper.administradorCreateDtoToAdministrador(adminDto);

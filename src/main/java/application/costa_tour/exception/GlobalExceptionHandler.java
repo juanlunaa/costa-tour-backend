@@ -26,9 +26,9 @@ public class GlobalExceptionHandler {
                 HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(AdminAlreadyExistException.class)
+    @ExceptionHandler(UserAlreadyExistException.class)
     public ResponseEntity<?> handlerAdminAlreadyExistException (
-            AdminAlreadyExistException ex,
+            UserAlreadyExistException ex,
             WebRequest webRequest
     ) {
         return new ResponseEntity<>(

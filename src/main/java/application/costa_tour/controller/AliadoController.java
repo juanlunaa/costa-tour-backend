@@ -3,7 +3,7 @@ package application.costa_tour.controller;
 import application.costa_tour.dto.AliadoCreateDTO;
 import application.costa_tour.dto.AliadoDTO;
 import application.costa_tour.dto.mapper.AliadoCreateMapper;
-import application.costa_tour.exception.AdminAlreadyExistException;
+import application.costa_tour.exception.UserAlreadyExistException;
 import application.costa_tour.model.Aliado;
 import application.costa_tour.model.enums.UserRole;
 import application.costa_tour.service.AliadoService;
@@ -33,7 +33,7 @@ public class AliadoController {
     public ResponseEntity<?> createAliado(@ModelAttribute @Valid AliadoCreateDTO aliadoDto) {
 
         if (usuarioService.isExitsAccountWithEmail(aliadoDto.getEmail())) {
-            throw new AdminAlreadyExistException("An account associated with an email already exists");
+            throw new UserAlreadyExistException("An account associated with an email already exists");
         }
 
         Aliado aliado = AliadoCreateMapper.mapper.aliadoCreateDtoToAliado(aliadoDto);
