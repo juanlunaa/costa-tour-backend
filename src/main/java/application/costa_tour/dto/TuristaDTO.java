@@ -1,5 +1,6 @@
 package application.costa_tour.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.util.Date;
@@ -12,6 +13,7 @@ public class TuristaDTO {
     private String tipoUsuario;
     private String nombre;
     private String apellido;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date fechaNacimiento;
     private Integer edad;
     private String email;
