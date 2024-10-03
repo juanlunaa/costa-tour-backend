@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
@@ -48,6 +50,24 @@ public class Turista {
         for (Interes interes : intereses) {
             InteresTurista newRelacionIt = new InteresTurista(this, interes);
             interesesTurista.add(newRelacionIt);
+        }
+    }
+
+    public void updateIntereses(List<Interes> newIntereses) {
+        Map<Long, Interes> newInteresesMap = newIntereses.stream()
+                .collect(Collectors.toMap(i -> i.getId(), i -> i));
+
+        interesesTurista.removeIf(it ->
+                !newInteresesMap.containsKey(it.getInteres().getId()));
+
+        for (Interes newInteres : newIntereses) {
+            boolean exits = interesesTurista.stream()
+                    .anyMatch(it -> it.getInteres().getId() == newInteres.getId());
+
+            if (!exits) {
+                InteresTurista newRelacionIt = new InteresTurista(this, newInteres);
+                interesesTurista.add(newRelacionIt);
+            }
         }
     }
 }

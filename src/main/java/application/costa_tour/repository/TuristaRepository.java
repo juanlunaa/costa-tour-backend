@@ -14,4 +14,7 @@ public interface TuristaRepository extends JpaRepository<Turista, String> {
 
     @Query("SELECT t FROM Turista t WHERE t.usuario.id = ?1 ")
     Optional<Turista> findTuristaByUsuarioId (Long userId);
+
+    @Query("SELECT t.usuario.email FROM Turista t WHERE t.dni = ?1")
+    Optional<String> findEmailUsuarioByTuristaDni(String dni);
 }
