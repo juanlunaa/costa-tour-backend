@@ -5,10 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
@@ -43,6 +40,11 @@ public class Turista {
 
     @OneToMany(mappedBy = "turista", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<InteresTurista> interesesTurista;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "dni_turista")
+    @OrderBy("fechaGuardado DESC")
+    private Set<Favorito> planesFavoritos = new HashSet<>();
 
     public void addIntereses(List<Interes> intereses) {
         this.interesesTurista = new ArrayList<>();

@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
 @Mapper
@@ -43,6 +44,11 @@ public interface TuristaMapper {
                 turista.getCiudad().getEstado().getPais().getId(),
                 turista.getCiudad().getEstado().getPais().getNombre()
         ));
+
+        turistaDTO.setPlanesFavoritos(turista.getPlanesFavoritos().stream()
+                .map(pf -> pf.getPlanId())
+                .collect(Collectors.toCollection(LinkedHashSet::new))
+        );
 
         turistaDTO.setIntereses(turista.getInteresesTurista().stream()
                 .map(it -> new InteresTuristaDTO(it.getInteres().getId(), it.getInteres().getPalabraClave()))

@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Data
 public class TuristaDTO {
@@ -21,5 +22,6 @@ public class TuristaDTO {
     private CiudadDTO ciudad;
     private EstadoDTO estado;
     private PaisDTO pais;
+    private Set<Long> planesFavoritos;
     private List<InteresTuristaDTO> intereses;
 }

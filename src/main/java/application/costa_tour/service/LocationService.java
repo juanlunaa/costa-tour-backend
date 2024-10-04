@@ -18,13 +18,13 @@ import java.util.List;
 public class LocationService {
 
     @Autowired
-    PaisRepository paisRepository;
+    private PaisRepository paisRepository;
 
     @Autowired
-    EstadoRepository estadoRepository;
+    private EstadoRepository estadoRepository;
 
     @Autowired
-    CiudadRepository ciudadRepository;
+    private CiudadRepository ciudadRepository;
 
     public List<PaisDTO> getAllPaises() {
         return PaisMapper.mapper.paisesToPaisesDto(paisRepository.findAllOrder());

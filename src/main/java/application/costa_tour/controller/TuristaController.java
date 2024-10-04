@@ -10,10 +10,7 @@ import application.costa_tour.jwt.JwtService;
 import application.costa_tour.model.Interes;
 import application.costa_tour.model.Turista;
 import application.costa_tour.model.enums.UserRole;
-import application.costa_tour.service.CiudadService;
-import application.costa_tour.service.InteresService;
-import application.costa_tour.service.TuristaService;
-import application.costa_tour.service.UsuarioService;
+import application.costa_tour.service.*;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +31,12 @@ public class TuristaController {
 
     @Autowired
     private TuristaService turistaService;
+
+    @Autowired
+    private FavoritoService favoritoService;
+
+    @Autowired
+    private PlanService planService;
 
     @Autowired
     private CiudadService ciudadService;
@@ -136,6 +139,28 @@ public class TuristaController {
 
         return new ResponseEntity<>(
                 turitaUpdated,
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping("/favorite/toggle")
+    public ResponseEntity<?> toggleFavorito(@RequestParam String dni, @RequestParam Long planId) {
+        if (!planService.isPlanExists(planId)) {
+            throw new ResourceNotFoundException(String
+                    .format("Plan not found for id=%s", planId));
+        }
+
+        String action = turistaService.toggleFavorite(
+                dni,
+                planId,
+                favoritoService.getFavoritoByTuristaAndPlan(dni, planId)
+        );
+
+        return new ResponseEntity<>(
+                SuccessResponse.builder()
+                        .message(String.
+                                format("Favorite plan %s successfully", action))
+                        .build(),
                 HttpStatus.OK
         );
     }
