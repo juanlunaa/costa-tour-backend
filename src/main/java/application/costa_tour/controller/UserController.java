@@ -1,5 +1,6 @@
 package application.costa_tour.controller;
 
+import application.costa_tour.dto.ChangePasswordDTO;
 import application.costa_tour.dto.request.AuthReqDTO;
 import application.costa_tour.dto.request.UpdateAvatarReqDTO;
 import application.costa_tour.exception.*;
@@ -144,6 +145,38 @@ public class UserController {
                         .build(),
                 HttpStatus.OK
                 );
+    }
+
+    @PutMapping("/update/credentials")
+    public ResponseEntity<?> updateCredentials(
+            @RequestParam("userId") Long userId,
+            @RequestBody ChangePasswordDTO newPassword,
+            HttpServletRequest req
+    ) {
+
+        if (!usuarioService.isExistsUser(userId)) {
+            throw new ResourceNotFoundException(String
+                    .format("User not found for id=%s", userId));
+        }
+
+        String token = jwtService.getTokenFromReq(req);
+
+        String email = jwtService.getEmailFromToken(token);
+
+//      Si el usuario tiene un token que no corresponde a la cuenta que quiere editar se lanzara esta excepcion
+        if (!usuarioService.macthEmailToken(userId, email)) {
+            throw new UnauthorizedException("Account not authorized");
+        }
+
+        usuarioService.updatePassword(userId, newPassword.getNewPassword());
+
+        return new ResponseEntity<>(
+                SuccessResponse.builder()
+                        .message("Password updated successfully")
+                        .build(),
+                HttpStatus.OK
+        );
+
     }
 
     private Cookie createJwtCookie(String token, int expirationTime) {

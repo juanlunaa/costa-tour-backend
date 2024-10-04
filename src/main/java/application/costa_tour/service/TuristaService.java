@@ -1,11 +1,9 @@
 package application.costa_tour.service;
 
 import application.costa_tour.dto.TuristaDTO;
-import application.costa_tour.dto.TuristaUpdateDTO;
 import application.costa_tour.dto.mapper.TuristaMapper;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.model.Interes;
-import application.costa_tour.model.InteresTurista;
 import application.costa_tour.model.Turista;
 import application.costa_tour.model.Usuario;
 import application.costa_tour.repository.TuristaRepository;
@@ -50,7 +48,7 @@ public class TuristaService {
         String emailUser = turistaRepository.findEmailUsuarioByTuristaDni(dni)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(String
-                                .format("Tourist not found for dni=%s", dni)));
+                                .format("Turist not found for dni=%s", dni)));
 
         return emailUser.equals(emailToken);
     }

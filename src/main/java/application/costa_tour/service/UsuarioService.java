@@ -66,6 +66,27 @@ public class UsuarioService {
         return usuario != null;
     }
 
+    public boolean macthEmailToken(Long userId, String emailToken) {
+        String emailUser = usuarioRepository.findEmailUsuarioByUsuarioId(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(String
+                                .format("User not found for id=%s", userId)));
+
+        return emailUser.equals(emailToken);
+    }
+
+    public void updatePassword(Long userId, String newPassword) {
+        Usuario usuario = usuarioRepository.findById(userId).orElse(null);
+
+        if (usuario.getPassword().equals(newPassword)) {
+            throw new BadRequestException("La nueva contraseña no puede ser la misma que la antigua");
+        }
+
+        usuario.setPassword(newPassword);
+
+        usuarioRepository.save(usuario);
+    }
+
     public void updateUserAvatarPath (Long userId, String filename) {
         String avatarUrl = "/files/avatars/" + filename;
 
