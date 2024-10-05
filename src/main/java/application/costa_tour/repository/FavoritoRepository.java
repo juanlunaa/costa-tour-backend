@@ -11,9 +11,6 @@ import java.util.Optional;
 @Repository
 public interface FavoritoRepository extends JpaRepository<Favorito, Long> {
 
-    List<Favorito> findByTuristaDni(String turistaDni);
-
-
     Optional<Favorito> findByTuristaDniAndPlanId(String turistaDni, Long planId);
 
     boolean existsByTuristaDniAndPlanId(String turistaDni, Long planId);

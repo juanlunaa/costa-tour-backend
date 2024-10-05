@@ -158,10 +158,19 @@ public class TuristaController {
 
         return new ResponseEntity<>(
                 SuccessResponse.builder()
-                        .message(String.
-                                format("Favorite plan %s successfully", action))
+                        .message(action)
                         .build(),
                 HttpStatus.OK
         );
+    }
+
+    @GetMapping("/favorite/all")
+    public ResponseEntity<?> getAllFavorites(@RequestParam String dni) {
+        if (!turistaService.isExistingTurista(dni)) {
+            throw new ResourceNotFoundException(String
+                    .format("Turist not found for dni=%s", dni));
+        }
+
+        return new ResponseEntity<>(planService.getPlansFavorites(dni), HttpStatus.OK);
     }
 }

@@ -98,6 +98,11 @@ public class PlanService {
         return planesCercanosAlTurista;
     }
 
+    public List<PlanDTO> getPlansFavorites(String dniTurista) {
+        return PlanMapper.mapper.plansToPlanDtos(
+                planRepository.findPlansFavoritesByTuristaDni(dniTurista));
+    }
+
     public double calculateDistanceBetweenPlanAndTurista(
             List<CaracteristicaPlanDTO> caracteristicasPlan,
             List<InteresTuristaDTO> interesTurista
