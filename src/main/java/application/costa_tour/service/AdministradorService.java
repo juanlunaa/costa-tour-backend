@@ -1,6 +1,7 @@
 package application.costa_tour.service;
 
 import application.costa_tour.dto.AdministradorDTO;
+import application.costa_tour.dto.AdministradorUpdateDTO;
 import application.costa_tour.dto.mapper.AdministradorMapper;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.model.Administrador;
@@ -24,7 +25,22 @@ public class AdministradorService {
         return AdministradorMapper.mapper.administradorToAdministradorDto(admin);
     }
 
+    public boolean isExistingAdminByUserId(Long userId) {
+        return administradorRepository.findAdministradorByUsuarioId(userId).orElse(null) != null;
+    }
+
     public void createAdmin (Administrador admin) {
         administradorRepository.save(admin);
+    }
+
+    public AdministradorDTO updateAdmin(Long userId, AdministradorUpdateDTO administradorDTO) {
+        Administrador previousAdmin = administradorRepository.findAdministradorByUsuarioId(userId).orElse(null);
+
+        previousAdmin.setNombre(administradorDTO.getNombre());
+        previousAdmin.setApellido(administradorDTO.getApellido());
+
+        Administrador adminUpdated = administradorRepository.save(previousAdmin);
+
+        return AdministradorMapper.mapper.administradorToAdministradorDto(adminUpdated);
     }
 }
