@@ -4,6 +4,6 @@ public enum PlanCategory {
     SITIO_TURISTICO,
     RESTAURANTE,
     PLAYA,
-    HOTEL,
+    ALOJAMIENTO,
     EXTREMO
 }
