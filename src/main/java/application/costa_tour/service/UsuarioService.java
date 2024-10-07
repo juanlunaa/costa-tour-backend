@@ -87,7 +87,7 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
     }
 
-    public void updateUserAvatarPath (Long userId, String filename) {
+    public String updateUserAvatarPath (Long userId, String filename) {
         String avatarUrl = "/files/avatars/" + filename;
 
         Usuario usuario = usuarioRepository.findById(userId).orElse(null);
@@ -95,5 +95,6 @@ public class UsuarioService {
         usuario.setFotoPerfil(avatarUrl);
 
         usuarioRepository.save(usuario);
+        return avatarUrl;
     }
 }

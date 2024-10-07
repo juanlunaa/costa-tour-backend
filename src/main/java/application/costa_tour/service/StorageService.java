@@ -1,5 +1,6 @@
 package application.costa_tour.service;
 
+import application.costa_tour.exception.BadRequestException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -98,7 +99,7 @@ public class StorageService {
                 Files.copy(inputStream, filePath, StandardCopyOption.REPLACE_EXISTING);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Failed saving file.", e);
+            throw new BadRequestException("Failed saving file");
         }
     }
 

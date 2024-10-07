@@ -19,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -120,15 +122,13 @@ public class UserController {
 
         String filename = storageService.saveAvatar(userId, file);
 
-        usuarioService
+        String fullpathAvatar = usuarioService
             .updateUserAvatarPath(
                 userId,
                 filename);
 
         return new ResponseEntity<>(
-                SuccessResponse.builder()
-                        .message("Avatar updated successfully")
-                        .build(),
+                Map.of("avatar", fullpathAvatar),
                 HttpStatus.OK
         );
     }

@@ -14,14 +14,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
 //  Se inyecta el filtro personalizado de JWT para añadirlo a la cadena de filtros
-    private final JwtAuthenticationFilter jwtAuthFilter;
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthFilter;
 
 //  Se inyecta el AuthenticationProvider configurado en ApplicationConfig
-    private final AuthenticationProvider authProvider;
+    @Autowired
+    private AuthenticationProvider authProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
