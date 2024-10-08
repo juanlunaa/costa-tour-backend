@@ -31,7 +31,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(req ->
                     req
                         .requestMatchers(
-                                "/user/**",
+                                "/user/auth",
+                                "/user/validate-email",
                                 "/plan/all",
                                 "/plan/{id}",
                                 "/interest/**",
@@ -40,6 +41,7 @@ public class SecurityConfig {
                                 "/turist/create",
                                 "/turist/validate-dni"
                         ).permitAll()
+                        .requestMatchers("/user/**").authenticated()
                         .requestMatchers("/plan/**").authenticated()
                         .anyRequest().authenticated()
                     )
