@@ -20,7 +20,6 @@ public class PlanCreateDTO {
     private String rangoMinDinero;
     @NotEmpty
     private String rangoMaxDinero;
-    @NotNull
     private List<MultipartFile> imagenesFiles;
     @NotNull
     private float latitud;
@@ -32,4 +31,5 @@ public class PlanCreateDTO {
     private int miniaturaSelect;
     @NotEmpty
     private List<Long> caracteristicas;
+    private List<String> imagenesExistentes;
 }

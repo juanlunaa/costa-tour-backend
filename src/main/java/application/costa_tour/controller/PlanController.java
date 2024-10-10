@@ -95,10 +95,10 @@ public class PlanController {
                     .format("Plan not found for id=%s", idPlan));
         }
 
-        createAndUpdateValidations(
-                planCreateDTO.getCaracteristicas(),
-                planCreateDTO.getMiniaturaSelect(),
-                planCreateDTO.getImagenesFiles().size());
+//        createAndUpdateValidations(
+//                planCreateDTO.getCaracteristicas(),
+//                planCreateDTO.getMiniaturaSelect(),
+//                planCreateDTO.getImagenesFiles().size());
 
         Plan plan = PlanCreateMapper.mapper.planCreateDtoToPlan(planCreateDTO);
         String prevPlanName = planService.getNombrePlan(idPlan);
@@ -107,7 +107,13 @@ public class PlanController {
                 .map(c -> new Caracteristica(c))
                 .collect(Collectors.toList());
 
-        List<String> urls = storageService.updatePlanImages(idPlan, prevPlanName, plan.getNombre(), planCreateDTO.getImagenesFiles());
+        List<String> urls =
+                storageService.updatePlanImages(
+                        idPlan,
+                        prevPlanName,
+                        plan.getNombre(),
+                        planCreateDTO.getImagenesExistentes(),
+                        planCreateDTO.getImagenesFiles());
 
         plan.setImagenMiniatura(urls.get(planCreateDTO.getMiniaturaSelect()));
 
