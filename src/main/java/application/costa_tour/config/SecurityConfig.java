@@ -36,6 +36,7 @@ public class SecurityConfig {
                                 "/plan/all",
                                 "/plan/{id}",
                                 "/interest/**",
+                                "/characteristic/**",
                                 "/files/**",
                                 "/location/**",
                                 "/turist/create",

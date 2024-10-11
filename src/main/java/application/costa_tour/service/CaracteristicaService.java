@@ -1,5 +1,7 @@
 package application.costa_tour.service;
 
+import application.costa_tour.dto.CaracteristicaDTO;
+import application.costa_tour.dto.mapper.CaracteristicaMapper;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.model.Caracteristica;
 import application.costa_tour.repository.CaracteristicaRepository;
@@ -15,6 +17,10 @@ public class CaracteristicaService {
 
     @Autowired
     private CaracteristicaRepository caracteristicaRepository;
+
+    public List<CaracteristicaDTO> getAllCaracteristicas() {
+        return CaracteristicaMapper.mapper.caracteristicasToCaracteristicasDtos(caracteristicaRepository.findAll());
+    }
 
     public Caracteristica getCaracteristica (Long id) {
         return caracteristicaRepository.findById(id).orElse(null);
