@@ -4,6 +4,8 @@ import application.costa_tour.dto.PlanCreateDTO;
 import application.costa_tour.dto.PlanDTO;
 import application.costa_tour.dto.TuristaDTO;
 import application.costa_tour.dto.mapper.PlanCreateMapper;
+import application.costa_tour.dto.mapper.plan.PlanExclusivoCreateMapper;
+import application.costa_tour.dto.plan.PlanExclusivoCreateDTO;
 import application.costa_tour.exception.BadRequestException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.exception.SuccessResponse;
@@ -25,6 +27,9 @@ public class PlanController {
 
     @Autowired
     private PlanService planService;
+
+    @Autowired
+    private PlanExclusivoService planExclusivoService;
 
     @Autowired
     private TuristaService turistaService;
@@ -163,6 +168,46 @@ public class PlanController {
         );
 
         return ResponseEntity.ok(planesRecomendados);
+    }
+
+    @GetMapping("/exclusive/all")
+    public ResponseEntity<?> getPlanesExclusivos () {
+        return ResponseEntity.ok(planExclusivoService.getAllPlanExclusivo());
+    }
+
+    @PostMapping("/exclusive/create")
+    public ResponseEntity<?> createPlanExclusivo (@ModelAttribute @Valid PlanExclusivoCreateDTO planCreateDTO) {
+
+        createAndUpdateValidations(
+                planCreateDTO.getCaracteristicas(),
+                planCreateDTO.getMiniaturaSelect(),
+                planCreateDTO.getImagenesFiles().size());
+
+        PlanExclusivo planExclusivo = PlanExclusivoCreateMapper.mapper.planExclusivoCreateDtoToPlanExclusivo(planCreateDTO);
+
+        planExclusivo.addServiciosIncluidos(planCreateDTO.getServiciosIncluidos());
+        planExclusivo.addInformacionAdicional(planCreateDTO.getInformacionAdicional());
+        planExclusivo.addDisponibilidad(planCreateDTO.getDisponibilidad());
+        planExclusivo.addCaracteristicas(planCreateDTO.getCaracteristicas().stream()
+                .map(ic -> new Caracteristica(ic))
+                .collect(Collectors.toList())
+        );
+
+        planExclusivo = planExclusivoService.createPlanExclusivo(planExclusivo);
+
+        List<String> urls = storageService.savePlanImages(planExclusivo.getId(), planExclusivo.getNombre(), planCreateDTO.getImagenesFiles());
+
+        planExclusivo.addImagenes(urls);
+        planExclusivo.setImagenMiniatura(urls.get(planCreateDTO.getMiniaturaSelect()));
+
+        planExclusivoService.createPlanExclusivo(planExclusivo);
+
+        return new ResponseEntity<>(
+                SuccessResponse
+                        .builder()
+                        .message("Exclusive plan created successfully")
+                        .build(),
+                HttpStatus.OK);
     }
 
     private void createAndUpdateValidations(List<Long> idCaracteristicasList, int miniaturaSelect, int imagesFilesSize) {

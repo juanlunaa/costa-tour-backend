@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @Entity
 @Table(name = "plan")
+@Inheritance(strategy = InheritanceType.JOINED)
 public class Plan {
     @Id
     @Column(name = "id_plan")
