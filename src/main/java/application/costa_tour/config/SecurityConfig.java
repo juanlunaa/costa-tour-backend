@@ -33,8 +33,9 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/user/auth",
                                 "/user/validate-email",
-                                "/plan/all",
-                                "/plan/{id}",
+                                "/plan/**",
+//                                "/plan/all",
+//                                "/plan/{id}",
                                 "/interest/**",
                                 "/characteristic/**",
                                 "/files/**",
@@ -43,7 +44,7 @@ public class SecurityConfig {
                                 "/turist/validate-dni"
                         ).permitAll()
                         .requestMatchers("/user/**").authenticated()
-                        .requestMatchers("/plan/**").authenticated()
+//                        .requestMatchers("/plan/**").authenticated()
                         .anyRequest().authenticated()
                     )
 //              No se crearan ni se usaran sesiones HTTP para almacenar información sobre el usuario autenticado
