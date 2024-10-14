@@ -32,7 +32,8 @@ public class PlanService {
     }
 
     public List<PlanDTO> getAllPlans () {
-        return PlanMapper.mapper.plansToPlanDtos(planRepository.findAll());
+//        return PlanMapper.mapper.plansToPlanDtos(planRepository.findAll());
+        return PlanMapper.mapper.plansToPlanDtos(planRepository.findAllPlansWithoutPlansExclusive());
     }
 
     public List<PlanDTO> getPlansByCategoria(PlanCategory categoria) {

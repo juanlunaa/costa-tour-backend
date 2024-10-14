@@ -27,6 +27,12 @@ public interface PlanRepository extends JpaRepository<Plan, Long> {
             """)
     List<Plan> findPlansFavoritesByTuristaDni(String turistaDni);
 
+    @Query("""
+            SELECT p
+            FROM Plan p
+            WHERE p.categoria != EXTREMO
+            """)
+    List<Plan> findAllPlansWithoutPlansExclusive();
 //    @Query("SELECT AVG(f.calificacion) FROM Feedback f JOIN f.codigoPlan cp WHERE cp.plan.id = ?1")
 //    Double getAverageRatingByPlan(Long planId);
 }
