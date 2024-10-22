@@ -41,7 +41,8 @@ public class SecurityConfig {
                                 "/files/**",
                                 "/location/**",
                                 "/turist/create",
-                                "/turist/validate-dni"
+                                "/turist/validate-dni",
+                                "/payment/**"
                         ).permitAll()
                         .requestMatchers("/user/**").authenticated()
 //                        .requestMatchers("/plan/**").authenticated()
