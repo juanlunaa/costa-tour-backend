@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -154,20 +155,28 @@ public class PlanController {
 
     @GetMapping("/recomendation")
     public ResponseEntity<?> getPlanRecomendation(
-            @RequestParam PlanCategory categoria,
             @RequestParam String dniTurista
     ) {
-
+        PlanCategory[] categories = PlanCategory.values();
+        List<PlanDTO> recomendaciones = new ArrayList<>();
         TuristaDTO turista = turistaService.getTuristaByDni(dniTurista);
-        List<PlanDTO> planes = planService.getPlansByCategoria(categoria);
 
-        List<PlanDTO> planesRecomendados = planService.planRecomendation(
-                planes,
-                turista.getIntereses(),
-                3
-        );
+        for (PlanCategory cat : categories) {
+            if (!cat.equals(PlanCategory.EXTREMO)) {
+                List<PlanDTO> planes = planService.getPlansByCategoria(cat);
 
-        return ResponseEntity.ok(planesRecomendados);
+                List<PlanDTO> planesRecomendados = planService.planRecomendation(
+                        planes,
+                        turista.getIntereses(),
+                        3
+                );
+
+                recomendaciones.addAll(planesRecomendados);
+            }
+
+        }
+
+        return ResponseEntity.ok(recomendaciones);
     }
 
     @GetMapping("/exclusive/all")
