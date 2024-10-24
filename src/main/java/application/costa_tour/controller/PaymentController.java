@@ -33,17 +33,17 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
-    @PostMapping("/create-order")
-    public ResponseEntity<?> createOrder() {
-        PaymentResponse response = paymentService.createOrder(OrderRequest.builder()
-                        .title("El mejor plan de tu vida")
-                        .quantity(1)
-                        .price(new BigDecimal(500000))
-                        .currencyId("COP")
-                        .build());
-
-        return ResponseEntity.ok(response);
-    }
+//    @PostMapping("/create-order")
+//    public ResponseEntity<?> createOrder() {
+//        PaymentResponse response = paymentService.createOrder(OrderRequest.builder()
+//                        .title("El mejor plan de tu vida")
+//                        .quantity(1)
+//                        .price(new BigDecimal(500000))
+//                        .currencyId("COP")
+//                        .build());
+//
+//        return ResponseEntity.ok(response);
+//    }
 
     @GetMapping("/success")
     public String success() {

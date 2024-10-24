@@ -25,6 +25,11 @@ public class UsuarioService {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    public Usuario getUserById(Long id) {
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found for id=" + id));
+    }
+
     public Usuario getUserByEmail(String email) {
         return usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("Email not exists"));

@@ -6,4 +6,5 @@ import lombok.Data;
 public class PaymentResponse {
     private String initPoint;
     private String status;
+    private String paymentId;
 }

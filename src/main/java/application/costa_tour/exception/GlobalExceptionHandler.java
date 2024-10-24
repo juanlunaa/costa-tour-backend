@@ -14,6 +14,18 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(SubscriptionConflictException.class)
+    public ResponseEntity<?> handlerSubscriptionConflictException(
+            SubscriptionConflictException ex,
+            WebRequest webRequest
+    ) {
+        return new ResponseEntity<>(
+                new ErrorResponse(
+                        ex.getMessage(),
+                        webRequest.getDescription(false)),
+                HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(UnauthorizedException.class)
     public ResponseEntity<?> handlerUnauthorizedException(
             UnauthorizedException ex,
