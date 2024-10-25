@@ -8,13 +8,11 @@ import application.costa_tour.service.PaymentService;
 import application.costa_tour.service.SuscripcionService;
 import application.costa_tour.service.UsuarioService;
 import com.mercadopago.resources.payment.Payment;
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
 import java.math.BigDecimal;
 
 @RestController
