@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface PlanMapper {
 
     PlanMapper mapper = Mappers.getMapper(PlanMapper.class);
@@ -46,12 +46,14 @@ public interface PlanMapper {
         );
 
         planDto.setHechos(
-                plan.getHechos()
-                        .stream()
-                        .map(h -> {
-                            return new HechoPlanDTO(h.getId(), h.getDecripcion());
-                        })
-                        .collect(Collectors.toList())
+                plan.getHechos() != null ?
+                        plan.getHechos()
+                                .stream()
+                                .map(h -> {
+                                    return new HechoPlanDTO(h.getId(), h.getDecripcion());
+                                })
+                                .collect(Collectors.toList())
+                        : new ArrayList<>()
         );
 
         planDto.setCaracteristicas(

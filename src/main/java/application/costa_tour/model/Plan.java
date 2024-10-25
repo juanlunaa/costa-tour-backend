@@ -1,6 +1,7 @@
 package application.costa_tour.model;
 
 import application.costa_tour.model.enums.PlanCategory;
+import application.costa_tour.model.enums.PublicationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -41,6 +42,10 @@ public class Plan {
 
     @Column(name = "imagen_miniatura")
     private String imagenMiniatura;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_publicacion")
+    private PublicationStatus estadoPublicacion;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_ubicacion")

@@ -15,6 +15,13 @@ public class AliadoService {
     @Autowired
     private AliadoRepository aliadoRepository;
 
+    public Aliado getAliadoEntityByNit(String nitAliado) {
+        return aliadoRepository.findById(nitAliado)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(String
+                                .format("Aliado not found for nit=%s", nitAliado)));
+    }
+
     public AliadoDTO getAliadoByUser(Usuario user) {
         Aliado aliado = aliadoRepository.findAliadoByUsuarioId(user.getId())
                 .orElseThrow(() ->

@@ -2,6 +2,7 @@ package application.costa_tour.controller;
 
 import application.costa_tour.dto.PlanCreateDTO;
 import application.costa_tour.dto.PlanDTO;
+import application.costa_tour.dto.SolicitudPlanDTO;
 import application.costa_tour.dto.TuristaDTO;
 import application.costa_tour.dto.mapper.PlanCreateMapper;
 import application.costa_tour.dto.mapper.plan.PlanExclusivoCreateMapper;
@@ -34,9 +35,6 @@ public class PlanController {
 
     @Autowired
     private TuristaService turistaService;
-
-    @Autowired
-    private CaracteristicaPlanService caracteristicaPlanService;
 
     @Autowired
     private CaracteristicaService caracteristicaService;

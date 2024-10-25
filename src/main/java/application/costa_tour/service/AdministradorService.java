@@ -16,6 +16,13 @@ public class AdministradorService {
     @Autowired
     private AdministradorRepository administradorRepository;
 
+    public Administrador getAdministradorEntityById(Long adminId) {
+        return administradorRepository.findById(adminId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(String
+                                .format("Administrador not found for id=%s", adminId)));
+    }
+
     public AdministradorDTO getAdminByUser (Usuario user) {
         Administrador admin = administradorRepository.findAdministradorByUsuarioId(user.getId())
                 .orElseThrow(() ->
