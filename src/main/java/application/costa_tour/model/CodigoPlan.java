@@ -25,12 +25,12 @@ public class CodigoPlan {
     @Column(name = "fecha_generacion")
     private LocalDateTime fechaGeneracion;
 
-    @Column(name = "fecha_expiracion")
-    private LocalDateTime fechaExpiracion;
+    @Column(name = "fecha_uso")
+    private LocalDateTime fechaUso;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "estado_vigencia")
-    private CodePlanStatus estadoVigencia;
+    @Column(name = "estado")
+    private CodePlanStatus estado;
 
     @ManyToOne
     @JoinColumn(name = "dni_turista")
