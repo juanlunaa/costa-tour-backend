@@ -25,7 +25,10 @@ public class PaymentService {
     @Value("${mercadopago.access.token}")
     private String accessToken;
 
-    public PaymentResponse createOrder(OrderRequest order, String externalReference, String webhookRoute) {
+    @Value("${https.domain.ngrok}")
+    private String httpsDomainNgrok;
+
+    public PaymentResponse createOrder(OrderRequest order, String externalReference, String webhookRoute, String successUrl, String failureUrl) {
         MercadoPagoConfig.setAccessToken(accessToken);
 
         PreferenceClient client = new PreferenceClient();
@@ -41,11 +44,11 @@ public class PaymentService {
                 .items(Collections.singletonList(item))
                 .externalReference(externalReference)
                 .backUrls(PreferenceBackUrlsRequest.builder()
-                        .success("http://localhost:4000/payment/success")
-                        .failure("http://localhost:4000/payment/failure")
+                        .success(successUrl)
+                        .failure(failureUrl)
                         .pending("http://localhost:4000/payment/pending")
                         .build())
-                .notificationUrl(String.format("https://8cdc-2800-e2-3580-1113-4161-35c6-55e2-b599.ngrok-free.app/%s", webhookRoute))
+                .notificationUrl(httpsDomainNgrok + webhookRoute)
 //                .autoReturn("approved")
                 .build();
 

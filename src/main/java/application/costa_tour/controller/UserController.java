@@ -1,6 +1,8 @@
 package application.costa_tour.controller;
 
+import application.costa_tour.dto.AliadoDTO;
 import application.costa_tour.dto.ChangePasswordDTO;
+import application.costa_tour.dto.TuristaDTO;
 import application.costa_tour.dto.request.AuthReqDTO;
 import application.costa_tour.dto.request.UpdateAvatarReqDTO;
 import application.costa_tour.exception.*;
@@ -39,6 +41,9 @@ public class UserController {
 
     @Autowired
     private AliadoService aliadoService;
+
+    @Autowired
+    private SuscripcionService suscripcionService;
 
     @Autowired
     private JwtService jwtService;
@@ -190,7 +195,9 @@ public class UserController {
 
     private Object getUsertypeByUser(Usuario user) {
         if (user.getTipo().equals(UserRole.TURISTA)) {
-            return turistaService.getTuristaByUser(user);
+            TuristaDTO turistaDTO = turistaService.getTuristaByUser(user);
+            turistaDTO.setExclusivo(suscripcionService.hasActiveSubscription(user));
+            return turistaDTO;
         }
 
         if (user.getTipo().equals(UserRole.ADMINISTRADOR)) {
@@ -198,7 +205,9 @@ public class UserController {
         }
 
         if (user.getTipo().equals(UserRole.ALIADO)) {
-            return aliadoService.getAliadoByUser(user);
+            AliadoDTO aliadoDTO = aliadoService.getAliadoByUser(user);
+            aliadoDTO.setExclusivo(suscripcionService.hasActiveSubscription(user));
+            return aliadoDTO;
         }
 
         return null;

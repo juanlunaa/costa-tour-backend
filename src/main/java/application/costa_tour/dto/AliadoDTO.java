@@ -13,4 +13,5 @@ public class AliadoDTO {
     private String telefono;
     private String email;
     private String avatar;
+    private boolean exclusivo;
 }

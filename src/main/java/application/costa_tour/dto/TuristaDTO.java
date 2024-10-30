@@ -24,4 +24,5 @@ public class TuristaDTO {
     private PaisDTO pais;
     private Set<Long> planesFavoritos;
     private List<InteresTuristaDTO> intereses;
+    private boolean exclusivo;
 }

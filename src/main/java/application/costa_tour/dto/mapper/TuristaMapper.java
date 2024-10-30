@@ -9,7 +9,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
-@Mapper
+@Mapper(componentModel = "spring")
 public interface TuristaMapper {
 
     TuristaMapper mapper = Mappers.getMapper(TuristaMapper.class);

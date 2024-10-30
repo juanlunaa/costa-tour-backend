@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface SuscripcionRepository extends JpaRepository<Suscripcion, Long> {
     Optional<Suscripcion> findByTipo(SubscriptionUser tipo);
+    Optional<Suscripcion> findByIdAndTipo(Long id, SubscriptionUser tipo);
 }

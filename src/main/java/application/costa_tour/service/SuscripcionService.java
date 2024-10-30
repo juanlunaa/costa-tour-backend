@@ -31,12 +31,21 @@ public class SuscripcionService {
     @Autowired
     private SuscripcionRepository suscripcionRepository;
 
-    public Suscripcion getSubscriptionByType(SubscriptionUser tipo) {
-        return suscripcionRepository.findByTipo(tipo)
+    public Suscripcion getSubscriptionById(Long id) {
+        return suscripcionRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription not found for id= " + id));
+    }
+
+    public Suscripcion getSubscriptionByType(Long id, SubscriptionUser tipo) {
+        return suscripcionRepository.findByIdAndTipo(id, tipo)
                 .orElseThrow(() -> new ResourceNotFoundException("Subscription not found for type= " + tipo));
     }
 
-    public UsuarioSuscripcion crearSuscripcion(Usuario usuario) {
+    public boolean hasActiveSubscription(Usuario usuario) {
+        return usuarioSuscripcionRepository.findByUsuarioIdAndEstado(usuario.getId(), SubscriptionStatus.ACTIVA).isPresent();
+    }
+
+    public UsuarioSuscripcion crearSuscripcion(Usuario usuario, Long suscripcionId) {
         // Se verifica si el usuario ya tiene una suscripcion activa
         Optional<UsuarioSuscripcion> suscripcionExistente =
                 usuarioSuscripcionRepository.findByUsuarioIdAndEstado(usuario.getId(), SubscriptionStatus.ACTIVA);
@@ -52,7 +61,7 @@ public class SuscripcionService {
 
         UsuarioSuscripcion userSuscripcion = UsuarioSuscripcion.builder()
                 .usuario(usuario)
-                .suscripcion(getSubscriptionByType(usuario.getTipo() == UserRole.ALIADO ? SubscriptionUser.ALIADO : SubscriptionUser.TURISTA))
+                .suscripcion(getSubscriptionByType(suscripcionId, usuario.getTipo() == UserRole.ALIADO ? SubscriptionUser.ALIADO : SubscriptionUser.TURISTA))
                 .estado(SubscriptionStatus.PENDIENTE)
                 .idPago(generateExternalReference())
                 .build();
@@ -69,9 +78,11 @@ public class SuscripcionService {
         return usuarioSuscripcionRepository.save(userSuscripcion);
     }
 
-    public UsuarioSuscripcion activarSuscripcion(String paymentId, int durationDays) {
+    public UsuarioSuscripcion activarSuscripcion(String paymentId) {
         UsuarioSuscripcion userSuscripcion = usuarioSuscripcionRepository.findByIdPago(paymentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Subscription not found for payment id= " + paymentId));
+
+        int durationDays = userSuscripcion.getSuscripcion().getDescripcion().equalsIgnoreCase("ANUAL") ? 365 : 30;
 
         LocalDateTime now = LocalDateTime.now();
         userSuscripcion.setEstado(SubscriptionStatus.ACTIVA);

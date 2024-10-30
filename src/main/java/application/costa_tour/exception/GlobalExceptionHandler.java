@@ -7,12 +7,25 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<?> handleTypeMismatchException(
+            MethodArgumentTypeMismatchException ex,
+            WebRequest webRequest
+    ) {
+        return new ResponseEntity<>(
+                new ErrorResponse(
+                        ex.getMessage(),
+                        webRequest.getDescription(false)),
+                HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(SubscriptionConflictException.class)
     public ResponseEntity<?> handlerSubscriptionConflictException(
