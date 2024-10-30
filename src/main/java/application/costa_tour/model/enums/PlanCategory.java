@@ -5,5 +5,6 @@ public enum PlanCategory {
     RESTAURANTE,
     PLAYA,
     ALOJAMIENTO,
-    EXTREMO
+    EXTREMO,
+    NIGHTLIFE,
 }

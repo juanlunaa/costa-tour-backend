@@ -24,6 +24,13 @@ public class PlanService {
     @Autowired
     private PlanRepository planRepository;
 
+    public Plan getPlanEntityById (Long id) {
+        return planRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(String
+                                .format("Plan not found for id=%s", id)));
+    }
+
     public PlanDTO getPlan (Long id) {
         return PlanMapper.mapper.planToPlanDto(planRepository.findById(id)
                         .orElseThrow(() ->

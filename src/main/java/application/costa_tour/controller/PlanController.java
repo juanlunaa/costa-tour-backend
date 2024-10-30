@@ -1,18 +1,18 @@
 package application.costa_tour.controller;
 
-import application.costa_tour.dto.PlanCreateDTO;
-import application.costa_tour.dto.PlanDTO;
-import application.costa_tour.dto.SolicitudPlanDTO;
-import application.costa_tour.dto.TuristaDTO;
+import application.costa_tour.dto.*;
 import application.costa_tour.dto.mapper.PlanCreateMapper;
 import application.costa_tour.dto.mapper.plan.PlanExclusivoCreateMapper;
 import application.costa_tour.dto.plan.PlanExclusivoCreateDTO;
 import application.costa_tour.exception.BadRequestException;
 import application.costa_tour.exception.ResourceNotFoundException;
 import application.costa_tour.exception.SuccessResponse;
+import application.costa_tour.jwt.JwtService;
 import application.costa_tour.model.*;
 import application.costa_tour.model.enums.PlanCategory;
+import application.costa_tour.model.enums.PublicationStatus;
 import application.costa_tour.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -43,7 +44,13 @@ public class PlanController {
     private UbicacionService ubicacionService;
 
     @Autowired
+    private CodigoPlanService codigoPlanService;
+
+    @Autowired
     private StorageService storageService;
+
+    @Autowired
+    private JwtService jwtService;
 
     @GetMapping("/all")
     public ResponseEntity<?> getPlanes () {
@@ -51,8 +58,20 @@ public class PlanController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getPlan (@PathVariable("id") Long id) {
-        return ResponseEntity.ok(planService.getPlan(id));
+    public ResponseEntity<?> getPlan (@PathVariable("id") Long id, HttpServletRequest req) {
+        String token = jwtService.getTokenFromReq(req);
+
+        PlanDTO planDTO = planService.getPlan(id);
+        CodigoPlanDTO codigoPlanDTO = null;
+        if (token != null) {
+            String email = jwtService.getEmailFromToken(token);
+            Turista turista = turistaService.getTuristaEntityByEmail(email);
+            if (turista != null) {
+                codigoPlanDTO = codigoPlanService.getCodigoByTuristaAndPlan(turista, planDTO.getId());
+            }
+        }
+
+        return ResponseEntity.ok(codigoPlanDTO != null ? Map.of("plan", planDTO, "codigoPlan", codigoPlanDTO) : Map.of("plan", planDTO));
     }
 
     // falta añadir el tema de los hechos para los planes de categoria SITIOS_TURISTICOS
@@ -70,6 +89,8 @@ public class PlanController {
                 .map(ic -> new Caracteristica(ic))
                 .collect(Collectors.toList())
         );
+
+        plan.setEstadoPublicacion(PublicationStatus.PUBLICADO);
 
         plan = planService.createPlan(plan);
 
@@ -163,18 +184,23 @@ public class PlanController {
             if (!cat.equals(PlanCategory.EXTREMO)) {
                 List<PlanDTO> planes = planService.getPlansByCategoria(cat);
 
-                List<PlanDTO> planesRecomendados = planService.planRecomendation(
-                        planes,
-                        turista.getIntereses(),
-                        3
-                );
+//                List<PlanDTO> planesRecomendados = planService.planRecomendation(
+//                        planes,
+//                        turista.getIntereses(),
+//                        3
+//                );
 
-                recomendaciones.addAll(planesRecomendados);
+                recomendaciones.addAll(planes);
             }
 
         }
 
         return ResponseEntity.ok(recomendaciones);
+    }
+
+    @GetMapping("/exclusive/{id}")
+    public ResponseEntity<?> getPlanExclusivo (@PathVariable("id") Long id) {
+        return ResponseEntity.ok(planExclusivoService.getPlanExclusivoById(id));
     }
 
     @GetMapping("/exclusive/all")

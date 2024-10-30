@@ -26,11 +26,20 @@ public class TuristaService {
     @Autowired
     private TuristaRepository turistaRepository;
 
+    public Turista getTuristaEntityByDni (String dniTurista) {
+        Turista turista = turistaRepository.findById(dniTurista)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(String
+                                .format("Turist not found for dni=%s", dniTurista)));
+
+        return turista;
+    }
+
     public TuristaDTO getTuristaByUser (Usuario user) {
         Turista turista = turistaRepository.findTuristaByUsuarioId(user.getId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(String
-                            .format("Tourist not found for user id=%s", user.getId())));
+                            .format("Turist not found for user id=%s", user.getId())));
 
         return TuristaMapper.mapper.turistaToTuristaDto(turista);
     }
@@ -39,9 +48,15 @@ public class TuristaService {
         Turista turista = turistaRepository.findById(dni)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(String
-                                .format("Tourist not found for dni=%s", dni)));
+                                .format("Turist not found for dni=%s", dni)));
 
         return TuristaMapper.mapper.turistaToTuristaDto(turista);
+    }
+
+    public Turista getTuristaEntityByEmail (String email) {
+        Turista turista = turistaRepository.findByUsuarioEmail(email)
+                .orElse(null);
+        return turista;
     }
 
     public boolean isExistingTurista (String dni) {

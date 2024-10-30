@@ -15,6 +15,10 @@ public class PlanExclusivoService {
     @Autowired
     private PlanExclusivoRepository planExclusivoRepository;
 
+    public PlanExclusivoDTO getPlanExclusivoById(Long id) {
+        return PlanExclusivoMapper.mapper.planExclusivoToPlanExclusivoDto(planExclusivoRepository.findById(id).orElse(null));
+    }
+
     public List<PlanExclusivoDTO> getAllPlanExclusivo() {
         return PlanExclusivoMapper.mapper.planExclusivosToPlanExclusivoDtos(planExclusivoRepository.findAll());
     }
